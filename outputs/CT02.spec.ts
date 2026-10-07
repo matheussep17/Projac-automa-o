@@ -16,6 +16,7 @@ test.describe('Plano de Trabalho Financeiro - repercussão financeira', () => {
     await page.getByRole('option', { name: 'Pesquisa', exact: true }).click();
     await page.getByRole('combobox', { name: 'Projeto' }).click();
     await page.getByRole('option').first().click();
+    await expect(page.getByRole('combobox', { name: 'Projeto' })).toHaveValue(/.+/);
 
     // Upload do extrato do projeto na aba Dados do Projeto.
     const extratoUpload = page.waitForEvent('filechooser');
@@ -52,6 +53,7 @@ test.describe('Plano de Trabalho Financeiro - repercussão financeira', () => {
     const valorDisponibilizado = page.getByLabel('Valor disponibilizado para o Plano de Trabalho');
     await valorDisponibilizado.fill('');
     await valorDisponibilizado.pressSequentially('1000000');
+    await expect(valorDisponibilizado).toHaveValue(/10\.000,00/);
     await page.getByRole('radio', { name: 'Público', exact: true }).check();
     await page.getByLabel('Tipo do instrumento do recurso financeiro').click({ force: true });
     await page.getByRole('option', { name: 'TED', exact: true }).click();
@@ -112,6 +114,7 @@ test.describe('Plano de Trabalho Financeiro - repercussão financeira', () => {
     const valorDao = page.getByLabel('Valor DAO a ser aplicado');
     await valorDao.fill('');
     await valorDao.pressSequentially('1000');
+    await expect(valorDao).toHaveValue(/10,00/);
     await page.getByRole('button', { name: 'Adicionar' }).click();
     await page.getByRole('combobox', { name: 'Rubrica', exact: true }).first().click({ force: true });
     await page.getByRole('option', { name: 'Pessoal, encargos sociais e benefícios', exact: true }).click();
@@ -120,6 +123,7 @@ test.describe('Plano de Trabalho Financeiro - repercussão financeira', () => {
     const valorSubrubrica = page.getByRole('textbox', { name: 'Valor da Sub-rubrica', exact: true });
     await valorSubrubrica.fill('');
     await valorSubrubrica.pressSequentially('990000');
+    await expect(valorSubrubrica).toHaveValue(/9\.900,00/);
     await page.getByRole('button', { name: 'Adicionar', exact: true }).last().click();
     // Os dois custos indiretos do CIP são obrigatórios no plano de aplicação,
     // mesmo quando o valor é zero.
@@ -191,6 +195,7 @@ test.describe('Plano de Trabalho Financeiro - repercussão financeira', () => {
       .getByRole('button', { name: 'Adicionar' });
     await adicionarParticipante.evaluate((button) => (button as HTMLButtonElement).click());
     await expect(page.getByRole('dialog', { name: 'Adicionar Participante' })).toBeHidden({ timeout: 10_000 });
+    await expect(page.getByRole('row', { name: /Abadia Dos Reis Nascimento.*Bolsista/ })).toContainText('20 mensal');
     await page.getByLabel('Justificar os valores dos salários indicando os seus referenciais:').fill(
       'Valor definido conforme a disponibilidade da sub-rubrica de Bolsas.',
     );
@@ -207,6 +212,7 @@ test.describe('Plano de Trabalho Financeiro - repercussão financeira', () => {
     await modalidadeBolsa.click({ force: true });
     await modalidadeBolsa.press('ArrowDown');
     await modalidadeBolsa.press('Enter');
+    await expect(page.getByRole('combobox', { name: 'Modalidade de bolsa' })).toHaveText(/.+/);
     await page.getByLabel('Justificativa').fill(
       'Tratamento tributário definido conforme a modalidade de bolsa e a natureza do projeto.',
     );
