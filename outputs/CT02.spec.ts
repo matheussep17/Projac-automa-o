@@ -107,7 +107,7 @@ test.describe('Plano de Trabalho Financeiro - repercussão financeira', () => {
     await page.getByRole('dialog').getByRole('button', { name: 'Adicionar' }).click();
     await page.getByRole('button', { name: 'Próxima Etapa' }).click();
 
-    // Plano de aplicação: DAO = 10 e Bolsas = 9.990
+    // Plano de aplicação: DAO = 10 e Bolsas = 9.900
     await page.getByLabel('Justificativa').fill('Não se aplicam custos indiretos para este cenário.');
     const valorDao = page.getByLabel('Valor DAO a ser aplicado');
     await valorDao.fill('');
@@ -119,7 +119,7 @@ test.describe('Plano de Trabalho Financeiro - repercussão financeira', () => {
     await page.getByRole('option', { name: 'Bolsas', exact: true }).click();
     const valorSubrubrica = page.getByRole('textbox', { name: 'Valor da Sub-rubrica', exact: true });
     await valorSubrubrica.fill('');
-    await valorSubrubrica.pressSequentially('999000');
+    await valorSubrubrica.pressSequentially('990000');
     await page.getByRole('button', { name: 'Adicionar', exact: true }).last().click();
     await page.getByRole('button', { name: 'Próxima Etapa' }).click();
 
@@ -165,51 +165,64 @@ test.describe('Plano de Trabalho Financeiro - repercussão financeira', () => {
     const periodoParticipante = page.getByRole('group', { name: 'Período *' });
     const inicioParticipante = periodoParticipante.getByRole('textbox').first();
     const fimParticipante = periodoParticipante.getByRole('textbox').last();
-    await inicioParticipante.evaluate((input) => input.removeAttribute('readonly'));
-    await fimParticipante.evaluate((input) => input.removeAttribute('readonly'));
-    await inicioParticipante.fill('10/01/2026');
-    await fimParticipante.fill('10/31/2026');
-    await inicioParticipante.dispatchEvent('change');
-    await fimParticipante.dispatchEvent('change');
-    await fimParticipante.press('Tab');
+    for (const input of [inicioParticipante, fimParticipante]) {
+      await input.evaluate((element) => element.removeAttribute('readonly'));
+      await input.fill('');
+      await input.pressSequentially('102026');
+      await input.press('Tab');
+    }
     await page.getByLabel('Quantidade de bolsas').fill('1');
     await page.getByLabel('Carga horária mensal').fill('20');
     const valorMensal = page.getByLabel('Valor mensal');
     await valorMensal.fill('');
-    await valorMensal.pressSequentially('999000');
+    await valorMensal.pressSequentially('990000');
+    await expect(valorMensal).toHaveValue(/9\.900,00/);
+    await expect(page.getByLabel('Valor total')).toHaveValue(/9\.900,00/);
     await page.keyboard.press('Escape');
-    await page.getByRole('dialog').getByRole('button', { name: 'Adicionar' }).click({ force: true });
-    await expect(page.getByRole('dialog', { name: 'Adicionar Participante' })).toBeHidden();
-    await page.getByLabel('Justificativa dos valores indicando seus referenciais').first().fill(
+    const adicionarParticipante = page.getByRole('dialog', { name: 'Adicionar Participante' })
+      .getByRole('button', { name: 'Adicionar' });
+    await adicionarParticipante.evaluate((button) => (button as HTMLButtonElement).click());
+    await expect(page.getByRole('dialog', { name: 'Adicionar Participante' })).toBeHidden({ timeout: 10_000 });
+    await page.getByLabel('Justificar os valores dos salários indicando os seus referenciais:').fill(
       'Valor definido conforme a disponibilidade da sub-rubrica de Bolsas.',
+    );
+    await page.getByLabel('Relatar a forma de seleção dos bolsistas:').fill(
+      'Seleção realizada conforme os critérios acadêmicos e institucionais do projeto.',
     );
     await page.getByRole('button', { name: 'Próxima Etapa' }).click();
 
     // Tratamento tributário
-    await page.getByLabel('Tratamento tributário').click();
+    await page.getByText('Tratamento tributário', { exact: true }).last().click();
+    await page.getByRole('combobox').first().click({ force: true });
     await page.getByRole('option', { name: 'Bolsa', exact: true }).click();
-    await page.getByLabel('Modalidade de bolsa').click();
-    await page.getByRole('option', { name: 'Ensino - Resolução 83 - 2021', exact: true }).click();
+    const modalidadeBolsa = page.getByLabel('Modalidade de bolsa');
+    await modalidadeBolsa.click({ force: true });
+    await modalidadeBolsa.press('ArrowDown');
+    await modalidadeBolsa.press('Enter');
     await page.getByLabel('Justificativa').fill(
       'Tratamento tributário definido conforme a modalidade de bolsa e a natureza do projeto.',
     );
-    await page.getByRole('button', { name: 'Próxima Etapa' }).click();
+    await page.keyboard.press('Escape');
+    await page.getByRole('button', { name: 'Próxima Etapa' }).click({ force: true });
 
     // Documento contratual
+    await page.getByText('Documento Contratual', { exact: true }).last().click();
     await page.getByRole('button', { name: 'Adicionar' }).click();
-    await page.getByLabel('Tipo de instrumento').click();
-    await page.getByRole('option', { name: 'Acordo de Parceria', exact: true }).click();
+    await page.getByText('Acordo de Parceria', { exact: true }).click();
     await page.getByLabel('Número do instrumento').fill('AP-CT01');
     await page.getByLabel('Número do processo SEI').fill('23070.000001/2026-01');
     await page.getByLabel('Início da vigência do contrato').fill('07/10/2026');
     await page.getByLabel('Fim da vigência do contrato').fill('31/12/2026');
-    await page.getByLabel('O instrumento de formalização possui contrato associado?').getByLabel('Não').check();
+    await page.getByText('Não', { exact: true }).click();
     await page.getByLabel('Vice-coordenador').click();
     await page.getByRole('option').first().click();
     await page.getByLabel('Fiscal').click();
     await page.getByRole('option').first().click();
-    await page.getByLabel('Valor do instrumento de formalização').fill('10000');
-    await page.getByRole('dialog').getByRole('button', { name: 'Adicionar' }).click();
+    const valorInstrumento = page.getByLabel('Valor do instrumento de formalização');
+    await valorInstrumento.fill('');
+    await valorInstrumento.pressSequentially('1000000');
+    await page.getByRole('dialog').getByRole('button', { name: 'Adicionar' })
+      .evaluate((button) => (button as HTMLButtonElement).click());
 
     // Conferência. O salvamento final fica fora deste teste durante a estabilização.
     await page.getByRole('button', { name: 'Conferir Dados', exact: true }).click();
