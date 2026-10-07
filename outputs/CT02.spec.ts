@@ -121,6 +121,14 @@ test.describe('Plano de Trabalho Financeiro - repercussão financeira', () => {
     await valorSubrubrica.fill('');
     await valorSubrubrica.pressSequentially('990000');
     await page.getByRole('button', { name: 'Adicionar', exact: true }).last().click();
+    // Os dois custos indiretos do CIP são obrigatórios no plano de aplicação,
+    // mesmo quando o valor é zero.
+    const cipUfg = page.getByRole('textbox', { name: 'Custos indiretos para a UFG' });
+    const cipUnidade = page.getByRole('textbox', { name: 'Custos indiretos para a UA/Órgão' });
+    await cipUfg.fill('');
+    await cipUfg.pressSequentially('0');
+    await cipUnidade.fill('');
+    await cipUnidade.pressSequentially('0');
     await page.getByRole('button', { name: 'Próxima Etapa' }).click();
 
     // Recursos da UFG: ambos os campos são obrigatórios no sistema.
@@ -224,8 +232,11 @@ test.describe('Plano de Trabalho Financeiro - repercussão financeira', () => {
     await page.getByRole('dialog').getByRole('button', { name: 'Adicionar' })
       .evaluate((button) => (button as HTMLButtonElement).click());
 
-    // Conferência. O salvamento final fica fora deste teste durante a estabilização.
+    // Conferência e salvamento final.
     await page.getByRole('button', { name: 'Conferir Dados', exact: true }).click();
     await expect(page.getByRole('heading', { name: 'Conferência de Dados' })).toBeVisible();
+    await page.getByRole('button', { name: /^Salvar$/ }).click();
+    await expect(page.getByText('Registro salvo com sucesso!', { exact: true })).toBeVisible();
+    await expect(page.getByText('Cadastrar Plano de Trabalho Financeiro', { exact: true }).first()).toBeVisible();
   });
 });
