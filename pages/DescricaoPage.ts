@@ -12,12 +12,14 @@ export class DescricaoPage {
     if (config.emExecucao) {
       await this.page.getByRole('checkbox', { name: 'Plano de Trabalho Financeiro em Execução' }).check();
     } else {
-      await expect(this.page.getByRole('checkbox', { name: 'Plano de Trabalho Financeiro em Execução' })).not.toBeChecked();
+      await expect(
+        this.page.getByRole('checkbox', { name: 'Plano de Trabalho Financeiro em Execução' }),
+      ).not.toBeChecked();
     }
 
-    await this.page.getByLabel('Objetivo(s) do Plano de Trabalho Financeiro').fill(
-      'Executar atividades de pesquisa e desenvolvimento para aprimoramento institucional.',
-    );
+    await this.page
+      .getByLabel('Objetivo(s) do Plano de Trabalho Financeiro')
+      .fill('Executar atividades de pesquisa e desenvolvimento para aprimoramento institucional.');
     await this.page.getByLabel('Entidade financiadora').click({ force: true });
     await this.page.getByRole('option', { name: 'Banco do Brasil', exact: true }).click();
     const valor = this.page.getByLabel('Valor disponibilizado para o Plano de Trabalho');

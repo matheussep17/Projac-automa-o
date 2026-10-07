@@ -4,7 +4,9 @@ export class QuadroPessoalPage {
   constructor(private readonly page: Page) {}
 
   async adicionarBolsista(valorMensal: string): Promise<void> {
-    await this.page.getByRole('combobox', { name: 'Tipos de participantes relacionados a este Plano de Trabalho Financeiro' }).click({ force: true });
+    await this.page
+      .getByRole('combobox', { name: 'Tipos de participantes relacionados a este Plano de Trabalho Financeiro' })
+      .click({ force: true });
     await this.page.getByRole('option', { name: 'Bolsista', exact: true }).click();
     await this.page.keyboard.press('Escape');
     await this.page.getByRole('button', { name: 'Adicionar' }).click();
@@ -37,15 +39,23 @@ export class QuadroPessoalPage {
     await mensal.pressSequentially(valorMensal);
     await expect(this.page.getByLabel('Valor total')).toHaveValue(/9\.900,00|10\.000,00/);
     await this.page.keyboard.press('Escape');
-    const adicionar = this.page.getByRole('dialog', { name: 'Adicionar Participante' }).getByRole('button', { name: 'Adicionar' });
+    const adicionar = this.page
+      .getByRole('dialog', { name: 'Adicionar Participante' })
+      .getByRole('button', { name: 'Adicionar' });
     await adicionar.evaluate((button) => (button as HTMLButtonElement).click());
     await expect(this.page.getByRole('dialog', { name: 'Adicionar Participante' })).toBeHidden({ timeout: 10_000 });
-    await this.page.getByLabel('Justificar os valores dos salários indicando os seus referenciais:').fill('Valor definido conforme a disponibilidade da sub-rubrica de Bolsas.');
-    await this.page.getByLabel('Relatar a forma de seleção dos bolsistas:').fill('Seleção realizada conforme os critérios acadêmicos e institucionais do projeto.');
+    await this.page
+      .getByLabel('Justificar os valores dos salários indicando os seus referenciais:')
+      .fill('Valor definido conforme a disponibilidade da sub-rubrica de Bolsas.');
+    await this.page
+      .getByLabel('Relatar a forma de seleção dos bolsistas:')
+      .fill('Seleção realizada conforme os critérios acadêmicos e institucionais do projeto.');
   }
 
   async validarEAvancar(): Promise<void> {
-    await expect(this.page.getByRole('row', { name: /Abadia Dos Reis Nascimento.*Bolsista/ })).toContainText('20 mensal');
+    await expect(this.page.getByRole('row', { name: /Abadia Dos Reis Nascimento.*Bolsista/ })).toContainText(
+      '20 mensal',
+    );
     await this.page.getByRole('button', { name: 'Próxima Etapa' }).click();
   }
 }

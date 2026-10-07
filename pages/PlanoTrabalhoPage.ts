@@ -1,11 +1,9 @@
 import { expect, Page } from '@playwright/test';
-import { loginAsTae } from '../outputs/auth';
 
 export class PlanoTrabalhoPage {
   constructor(private readonly page: Page) {}
 
   async iniciarCadastro(): Promise<void> {
-    await loginAsTae(this.page);
     await this.abrirCadastro();
   }
 

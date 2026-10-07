@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from '../fixtures/test';
 import path from 'node:path';
 import { PlanoTrabalhoPage } from '../pages/PlanoTrabalhoPage';
 import { ProjetoPage } from '../pages/ProjetoPage';
@@ -13,8 +13,8 @@ import { IndicadorMetaPage } from '../pages/IndicadorMetaPage';
 import { DesembolsoPage } from '../pages/DesembolsoPage';
 import { RecursosUfgPage } from '../pages/RecursosUfgPage';
 
-test.describe('Plano de Trabalho Financeiro - repercussão financeira', () => {
-  test('deve preencher, conferir e salvar o plano de trabalho financeiro', async ({ page }) => {
+test.describe('Plano de Trabalho Financeiro - repercussão financeira @execucao @fundacao', () => {
+  test('deve preencher, conferir e salvar o plano de trabalho financeiro @smoke', async ({ page }) => {
     const pdf = path.resolve('work/anexo-teste.pdf');
 
     const plano = new PlanoTrabalhoPage(page);

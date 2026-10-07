@@ -29,9 +29,11 @@ export async function loginAsTae(page: Page): Promise<void> {
     await expect(loginField).toBeHidden({ timeout: 15_000 });
   }
 
-  await expect(page.getByRole('button', { name: 'Example icon-button com um menu' }).or(
-    page.getByRole('button', { name: 'Example icon-button with a menu' }),
-  )).toBeVisible({ timeout: 15_000 });
+  await expect(
+    page
+      .getByRole('button', { name: 'Example icon-button com um menu' })
+      .or(page.getByRole('button', { name: 'Example icon-button with a menu' })),
+  ).toBeVisible({ timeout: 15_000 });
 
   const menuButton = page.getByRole('button', { name: /Example icon-button/ });
   await menuButton.click();

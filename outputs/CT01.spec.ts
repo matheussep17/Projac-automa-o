@@ -5,9 +5,7 @@ test.describe('CT01 - Cadastro, edição e exclusão de encargo trabalhista', ()
     const nomeInicial = `Encargo de teste CT01 ${Date.now()}`;
     const nomeEditado = `${nomeInicial} - editado`;
 
-    await page.goto(
-      'https://projetosacademicos-dev.ufg.br/projac/cadastros/encargos-trabalhistas',
-    );
+    await page.goto('https://projetosacademicos-dev.ufg.br/projac/cadastros/encargos-trabalhistas');
 
     await expect(page.getByRole('heading', { name: 'Encargos Trabalhistas' })).toBeVisible();
 
@@ -15,9 +13,7 @@ test.describe('CT01 - Cadastro, edição e exclusão de encargo trabalhista', ()
     await page.getByRole('button', { name: 'Cadastrar', exact: true }).click();
     await page.getByLabel('Benefício/gratificação', { exact: true }).fill(nomeInicial);
     await page.getByLabel('Fundação', { exact: true }).click();
-    await page
-      .getByRole('option', { name: 'Fundação de Apoio à Pesquisa', exact: true })
-      .click();
+    await page.getByRole('option', { name: 'Fundação de Apoio à Pesquisa', exact: true }).click();
     await page.getByLabel('Valor R$', { exact: true }).fill('123,45');
     await page.getByLabel('Ano de referência', { exact: true }).fill('2026');
     await page.getByRole('button', { name: 'Salvar', exact: true }).click();
@@ -38,9 +34,7 @@ test.describe('CT01 - Cadastro, edição e exclusão de encargo trabalhista', ()
 
     // Exclusão
     await linhaEditada.getByRole('button', { name: 'Excluir', exact: true }).click();
-    await expect(
-      page.getByText(`Você realmente deseja remover o item ${nomeEditado}?`),
-    ).toBeVisible();
+    await expect(page.getByText(`Você realmente deseja remover o item ${nomeEditado}?`)).toBeVisible();
     await page.getByRole('button', { name: 'Confirmar', exact: true }).click();
 
     await expect(page.getByText('Item excluído(a) com sucesso!')).toBeVisible();

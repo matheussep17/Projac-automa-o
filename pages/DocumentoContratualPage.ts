@@ -19,7 +19,9 @@ export class DocumentoContratualPage {
     const valorInstrumento = this.page.getByLabel('Valor do instrumento de formalização');
     await valorInstrumento.fill('');
     await valorInstrumento.pressSequentially('1000000');
-    await this.page.getByRole('dialog').getByRole('button', { name: 'Adicionar' })
+    await this.page
+      .getByRole('dialog')
+      .getByRole('button', { name: 'Adicionar' })
       .evaluate((button) => (button as HTMLButtonElement).click());
   }
 }
