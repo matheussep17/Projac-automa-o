@@ -3,6 +3,7 @@ import { loginAsTae } from '../outputs/auth';
 
 export const test = base.extend({
   page: async ({ page }, use) => {
+    await page.goto('/projac/', { waitUntil: 'domcontentloaded' });
     await loginAsTae(page);
     await use(page);
   },
