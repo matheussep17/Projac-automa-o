@@ -10,9 +10,14 @@ export class QuadroPessoalPage {
     await this.page.getByRole('option', { name: 'Bolsista', exact: true }).click();
     await this.page.keyboard.press('Escape');
     await this.page.getByRole('button', { name: 'Adicionar' }).click();
+    const dialog = this.page.getByRole('dialog', { name: 'Adicionar Participante' });
+    await expect(dialog).toBeVisible();
     await this.page.getByRole('combobox', { name: 'Tipo de participante', exact: true }).press('Enter');
     await this.page.getByRole('combobox', { name: 'Instituição de vinculação' }).click({ force: true });
     await this.page.getByRole('combobox', { name: 'Instituição de vinculação' }).press('Enter');
+    await expect(
+      this.page.getByRole('option', { name: /Universidade Federal de Goi/ }).first(),
+    ).toBeVisible({ timeout: 10_000 });
     await this.page.getByRole('option', { name: 'Universidade Federal de Goiás', exact: true }).click({ force: true });
     await this.page.getByRole('combobox', { name: 'Beneficiário' }).click({ force: true });
     await this.page.getByRole('combobox', { name: 'Beneficiário' }).press('Enter');
@@ -24,7 +29,9 @@ export class QuadroPessoalPage {
     await this.page.getByRole('combobox', { name: 'Escolaridade e/ou Experiência' }).click({ force: true });
     await this.page.getByRole('combobox', { name: 'Escolaridade e/ou Experiência' }).press('ArrowDown');
     await this.page.getByRole('combobox', { name: 'Escolaridade e/ou Experiência' }).press('Enter');
-    await this.page.getByLabel('Quantidade de meses').fill('1');
+    const quantidadeMeses = dialog.getByLabel('Quantidade de meses');
+    await expect(quantidadeMeses).toBeVisible({ timeout: 10_000 });
+    await quantidadeMeses.fill('1');
     const periodo = this.page.getByRole('group', { name: 'Período *' }).getByRole('textbox');
     for (const input of [periodo.first(), periodo.last()]) {
       await input.evaluate((element) => element.removeAttribute('readonly'));
@@ -39,9 +46,7 @@ export class QuadroPessoalPage {
     await mensal.pressSequentially(valorMensal);
     await expect(this.page.getByLabel('Valor total')).toHaveValue(/9\.900,00|10\.000,00/);
     await this.page.keyboard.press('Escape');
-    const adicionar = this.page
-      .getByRole('dialog', { name: 'Adicionar Participante' })
-      .getByRole('button', { name: 'Adicionar' });
+    const adicionar = dialog.getByRole('button', { name: 'Adicionar' });
     await adicionar.evaluate((button) => (button as HTMLButtonElement).click());
     await expect(this.page.getByRole('dialog', { name: 'Adicionar Participante' })).toBeHidden({ timeout: 10_000 });
     await this.page
