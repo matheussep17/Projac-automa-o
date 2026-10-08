@@ -21,7 +21,20 @@ export class DescricaoPage {
       .getByLabel('Objetivo(s) do Plano de Trabalho Financeiro')
       .fill('Executar atividades de pesquisa e desenvolvimento para aprimoramento institucional.');
     await this.page.getByLabel('Entidade financiadora').click({ force: true });
-    await this.page.getByRole('option', { name: 'Banco do Brasil', exact: true }).click();
+    const bancoDoBrasil = this.page.getByRole('option', {
+      name: 'Banco do Brasil',
+      exact: true,
+    });
+    if (await bancoDoBrasil.count()) {
+      await bancoDoBrasil.click();
+    } else {
+      await this.page
+        .getByRole('option', {
+          name: 'Caixa Econômica Federal',
+          exact: true,
+        })
+        .click();
+    }
     const valor = this.page.getByLabel('Valor disponibilizado para o Plano de Trabalho');
     await valor.fill('');
     await valor.pressSequentially('1000000');

@@ -2,7 +2,7 @@ import { expect, Page } from '@playwright/test';
 
 const LOGIN = process.env.PROJAC_LOGIN ?? 'igor_vieira';
 const PASSWORD = process.env.PROJAC_PASSWORD ?? 'igor_vieira';
-const HOME = 'https://projetosacademicos-dev.ufg.br/projac/';
+const HOME = `${process.env.TEST_BASE_URL ?? 'https://projetosacademicos-dev.ufg.br'}/projac/`;
 
 export async function loginAsTae(page: Page): Promise<void> {
   await page.goto(HOME, { waitUntil: 'domcontentloaded' });
@@ -47,4 +47,7 @@ export async function loginAsTae(page: Page): Promise<void> {
 
   await expect(page.getByText('Centro De Recursos Computacionais').first()).toBeVisible();
   await expect(menuButton).toContainText('Tae');
+
+  // Fecha o menu de perfil para não deixar o backdrop bloquear os testes.
+  await page.keyboard.press('Escape');
 }

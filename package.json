@@ -4,8 +4,10 @@
   "private": true,
   "scripts": {
     "test": "playwright test",
-    "test:ui": "playwright test --ui",
+    "test:dev": "cross-env TEST_ENV=dev TEST_BASE_URL=https://projetosacademicos-dev.ufg.br playwright test",
+    "test:homolog": "cross-env TEST_ENV=homolog TEST_BASE_URL=https://projetosacademicos-homolog.ufg.br playwright test",
     "test:headed": "playwright test --headed",
+    "test:homolog:headed": "cross-env TEST_ENV=homolog TEST_BASE_URL=https://projetosacademicos-homolog.ufg.br playwright test --headed",
     "test:debug": "playwright test --debug",
     "report": "playwright show-report",
     "typecheck": "tsc --noEmit",
@@ -15,13 +17,9 @@
     "quality": "npm run typecheck && npm run lint && npm run format:check"
   },
   "devDependencies": {
-    "@eslint/js": "^10.0.1",
     "@playwright/test": "latest",
     "@types/node": "latest",
-    "eslint": "^10.12.0",
-    "eslint-config-prettier": "^10.1.8",
-    "prettier": "^3.9.9",
-    "typescript": "latest",
-    "typescript-eslint": "^8.71.1"
+    "cross-env": "^10.1.0",
+    "typescript": "latest"
   }
 }
