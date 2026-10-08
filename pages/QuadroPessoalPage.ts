@@ -29,16 +29,22 @@ export class QuadroPessoalPage {
     await this.page.getByRole('combobox', { name: 'Escolaridade e/ou Experiência' }).click({ force: true });
     await this.page.getByRole('combobox', { name: 'Escolaridade e/ou Experiência' }).press('ArrowDown');
     await this.page.getByRole('combobox', { name: 'Escolaridade e/ou Experiência' }).press('Enter');
+    await pageEscape(this.page);
     const quantidadeMeses = dialog.getByLabel('Quantidade de meses');
     await expect(quantidadeMeses).toBeVisible({ timeout: 10_000 });
     await quantidadeMeses.fill('1');
-    const periodo = this.page.getByRole('group', { name: 'Período *' }).getByRole('textbox');
-    for (const input of [periodo.first(), periodo.last()]) {
-      await input.evaluate((element) => element.removeAttribute('readonly'));
-      await input.fill('');
-      await input.pressSequentially('102026');
-      await input.press('Tab');
-    }
+    const periodo = this.page.getByRole('group', { name: 'Período *' });
+    const periodoInput = periodo.locator('input:visible').first();
+    await periodoInput.click({ force: true });
+    await periodoInput.evaluate((element) => element.removeAttribute('readonly'));
+    await periodoInput.fill('10/2026');
+    await periodoInput.press('Tab');
+    const periodoFim = periodo.locator('input:visible').last();
+    await periodoFim.evaluate((element) => element.removeAttribute('readonly'));
+    await periodoFim.fill('10/2026');
+    await periodoFim.press('Tab');
+    await expect(periodoInput).toHaveValue('10/2026');
+    await expect(periodoFim).toHaveValue('10/2026');
     await this.page.getByLabel('Quantidade de bolsas').fill('1');
     await this.page.getByLabel('Carga horária mensal').fill('20');
     const mensal = this.page.getByLabel('Valor mensal');
