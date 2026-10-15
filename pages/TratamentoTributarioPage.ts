@@ -7,11 +7,19 @@ export class TratamentoTributarioPage {
     await this.page.getByText('Tratamento tributário', { exact: true }).last().click();
     await this.page.getByRole('combobox').first().click({ force: true });
     await this.page.getByRole('option', { name: 'Bolsa', exact: true }).click();
-    const modalidade = this.page.getByLabel('Modalidade de bolsa');
-    await modalidade.click({ force: true });
-    await modalidade.press('ArrowDown');
+    const modalidade = this.page.getByRole('combobox', {
+      name: 'Modalidade de bolsa',
+      exact: true,
+    });
+    await expect(modalidade).toBeEnabled();
+    await modalidade.focus();
     await modalidade.press('Enter');
-    await expect(this.page.getByRole('combobox', { name: 'Modalidade de bolsa' })).toHaveText(/.+/);
+    await this.page.getByRole('listbox').getByRole('option', {
+      name: 'Ensino - Resolução 83 - 2021',
+      exact: true,
+    }).click();
+    await expect(modalidade).toHaveAttribute('aria-expanded', 'false');
+    await expect(modalidade).toHaveText('Ensino - Resolução 83 - 2021');
     await this.page
       .getByLabel('Justificativa')
       .fill('Tratamento tributário definido conforme a modalidade de bolsa e a natureza do projeto.');

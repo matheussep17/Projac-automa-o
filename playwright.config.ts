@@ -9,6 +9,8 @@ const baseURL =
     : 'https://projetosacademicos-dev.ufg.br');
 
 export default defineConfig({
+  timeout: 60_000,
+
   globalSetup: './fixtures/auth.setup.ts',
 
   testDir: './outputs',

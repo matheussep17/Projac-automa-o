@@ -1,60 +1,69 @@
-import { expect, Page } from '@playwright/test';
+import { expect, Locator, Page } from '@playwright/test';
 
 export class QuadroPessoalPage {
   constructor(private readonly page: Page) {}
 
   async adicionarBolsista(valorMensal: string): Promise<void> {
-    await this.page
-      .getByRole('combobox', { name: 'Tipos de participantes relacionados a este Plano de Trabalho Financeiro' })
-      .click({ force: true });
-    await this.page.getByRole('option', { name: 'Bolsista', exact: true }).click();
-    await this.page.keyboard.press('Escape');
-    await this.page.getByRole('button', { name: 'Adicionar' }).click();
+    const tipoParticipante = this.page.getByRole('combobox', {
+      name: 'Tipos de participantes relacionados a este Plano de Trabalho Financeiro',
+    });
+    await this.selecionarOpcao(tipoParticipante, 'Bolsista');
+
+    await this.page.getByRole('button', { name: 'Adicionar Participante', exact: true }).click();
     const dialog = this.page.getByRole('dialog', { name: 'Adicionar Participante' });
     await expect(dialog).toBeVisible();
-    await this.page.getByRole('combobox', { name: 'Tipo de participante', exact: true }).press('Enter');
-    await this.page.getByRole('combobox', { name: 'Instituição de vinculação' }).click({ force: true });
-    await this.page.getByRole('combobox', { name: 'Instituição de vinculação' }).press('Enter');
-    await expect(
-      this.page.getByRole('option', { name: /Universidade Federal de Goi/ }).first(),
-    ).toBeVisible({ timeout: 10_000 });
-    await this.page.getByRole('option', { name: 'Universidade Federal de Goiás', exact: true }).click({ force: true });
-    await this.page.getByRole('combobox', { name: 'Beneficiário' }).click({ force: true });
-    await this.page.getByRole('combobox', { name: 'Beneficiário' }).press('Enter');
-    await this.page.getByRole('option', { name: 'Servidor', exact: true }).click();
-    await this.page.getByRole('combobox', { name: 'Nome do participante' }).click({ force: true });
-    await this.page.getByRole('combobox', { name: 'Nome do participante' }).press('Enter');
-    await this.page.getByRole('option', { name: /1866324\s*-\s*Abadia Dos Reis Nascimento/ }).click();
-    await pageEscape(this.page);
-    await this.page.getByRole('combobox', { name: 'Escolaridade e/ou Experiência' }).click({ force: true });
-    await this.page.getByRole('combobox', { name: 'Escolaridade e/ou Experiência' }).press('ArrowDown');
-    await this.page.getByRole('combobox', { name: 'Escolaridade e/ou Experiência' }).press('Enter');
-    await pageEscape(this.page);
-    const quantidadeMeses = dialog.getByLabel('Quantidade de meses');
-    await expect(quantidadeMeses).toBeVisible({ timeout: 10_000 });
-    await quantidadeMeses.fill('1');
-    const periodo = this.page.getByRole('group', { name: 'Período *' });
-    const periodoInput = periodo.locator('input:visible').first();
-    await periodoInput.click({ force: true });
-    await periodoInput.evaluate((element) => element.removeAttribute('readonly'));
-    await periodoInput.fill('10/2026');
-    await periodoInput.press('Tab');
+
+    const tipo = dialog.getByRole('combobox', { name: 'Tipo de participante', exact: true });
+    await this.selecionarOpcao(tipo, 'Bolsista');
+    await expect(tipo).toContainText('Bolsista');
+
+    const instituicao = dialog.getByRole('combobox', { name: 'Instituição de vinculação' });
+    await this.selecionarOpcao(instituicao, 'Universidade Federal de Goiás');
+
+    const beneficiario = dialog.getByRole('combobox', { name: 'Beneficiário' });
+    await this.selecionarOpcao(beneficiario, 'Servidor');
+
+    const nomeParticipante = dialog.getByRole('combobox', { name: 'Nome do participante' });
+    await expect(nomeParticipante).toBeEnabled({ timeout: 10_000 });
+    await nomeParticipante.fill('Abadia Dos Reis Nascimento');
+    const participante = this.page.getByRole('listbox').getByRole('option', {
+      name: /1866324\s*-\s*Abadia Dos Reis Nascimento/,
+    });
+    await expect(participante).toBeVisible({ timeout: 10_000 });
+    await participante.click();
+    await expect(nomeParticipante).toHaveValue(/Abadia Dos Reis Nascimento/);
+
+    const escolaridade = dialog.getByRole('combobox', { name: 'Escolaridade e/ou Experiência' });
+    await this.selecionarOpcao(escolaridade, 'Ensino Superior');
+
+    await dialog.getByLabel('Quantidade de meses').fill('1');
+    const periodo = dialog.getByRole('group', { name: 'Período *' });
+    const periodoInicio = periodo.locator('input:visible').first();
+    await this.preencherPeriodo(periodoInicio, '10/2026');
     const periodoFim = periodo.locator('input:visible').last();
-    await periodoFim.evaluate((element) => element.removeAttribute('readonly'));
-    await periodoFim.fill('10/2026');
-    await periodoFim.press('Tab');
-    await expect(periodoInput).toHaveValue('10/2026');
+    await this.preencherPeriodo(periodoFim, '10/2026');
+    await expect(periodoInicio).toHaveValue('10/2026');
     await expect(periodoFim).toHaveValue('10/2026');
-    await this.page.getByLabel('Quantidade de bolsas').fill('1');
-    await this.page.getByLabel('Carga horária mensal').fill('20');
-    const mensal = this.page.getByLabel('Valor mensal');
-    await mensal.fill('');
-    await mensal.pressSequentially(valorMensal);
-    await expect(this.page.getByLabel('Valor total')).toHaveValue(/9\.900,00|10\.000,00/);
-    await this.page.keyboard.press('Escape');
-    const adicionar = dialog.getByRole('button', { name: 'Adicionar' });
-    await adicionar.evaluate((button) => (button as HTMLButtonElement).click());
-    await expect(this.page.getByRole('dialog', { name: 'Adicionar Participante' })).toBeHidden({ timeout: 10_000 });
+
+    await dialog.getByLabel('Quantidade de bolsas').fill('1');
+    await dialog.getByLabel('Carga horária mensal').fill('20');
+    const valor = dialog.getByLabel('Valor mensal');
+    await valor.fill('');
+    await valor.pressSequentially(valorMensal);
+    await valor.press('Tab');
+    const valorEsperado = (Number(valorMensal) / 100).toLocaleString('pt-BR', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+    await expect(valor).toHaveValue(new RegExp(this.escaparRegex(valorEsperado) + '$'));
+    await expect(dialog.getByLabel('Valor total')).toHaveValue(
+      new RegExp(this.escaparRegex(valorEsperado) + '$'),
+    );
+
+    await dialog.getByRole('button', { name: 'Adicionar', exact: true }).click();
+    await expect(dialog).toBeHidden({ timeout: 10_000 });
+    await expect(this.linhaBolsista()).toContainText('20 mensal');
+
     await this.page
       .getByLabel('Justificar os valores dos salários indicando os seus referenciais:')
       .fill('Valor definido conforme a disponibilidade da sub-rubrica de Bolsas.');
@@ -64,13 +73,49 @@ export class QuadroPessoalPage {
   }
 
   async validarEAvancar(): Promise<void> {
-    await expect(this.page.getByRole('row', { name: /Abadia Dos Reis Nascimento.*Bolsista/ })).toContainText(
-      '20 mensal',
-    );
+    await expect(this.linhaBolsista()).toContainText('20 mensal');
     await this.page.getByRole('button', { name: 'Próxima Etapa' }).click();
   }
-}
 
-async function pageEscape(page: Page): Promise<void> {
-  await page.keyboard.press('Escape');
+  private async selecionarOpcao(combobox: Locator, nomeOpcao: string | RegExp): Promise<void> {
+    await expect(combobox).toBeEnabled({ timeout: 10_000 });
+    // O rótulo do Material intercepta cliques no centro do select.
+    await combobox.focus();
+    await combobox.press('Enter');
+    await expect(combobox).toHaveAttribute('aria-expanded', 'true');
+    // Há duas opções "Ensino Superior"; preserva a primeira correspondência.
+    const opcao = this.page.getByRole('listbox').getByRole('option', {
+      name: nomeOpcao,
+      exact: true,
+    }).first();
+    await expect(opcao).toBeVisible({ timeout: 10_000 });
+    // Não desmarca uma opção já selecionada em um mat-select múltiplo.
+    if ((await opcao.getAttribute('aria-selected')) !== 'true') {
+      await opcao.click();
+    }
+    if ((await combobox.getAttribute('aria-expanded')) === 'true') {
+      await combobox.press('Escape');
+    }
+    await expect(combobox).toHaveAttribute('aria-expanded', 'false');
+    await expect(combobox).toContainText(nomeOpcao, { timeout: 10_000 });
+  }
+
+  private linhaBolsista(): Locator {
+    return this.page
+      .getByRole('row')
+      .filter({ hasText: 'Abadia Dos Reis Nascimento' })
+      .filter({ hasText: 'Bolsista' });
+  }
+
+  private escaparRegex(valor: string): string {
+    return valor.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
+
+  private async preencherPeriodo(campo: Locator, valor: string): Promise<void> {
+    await campo.focus();
+    await campo.evaluate((element) => element.removeAttribute('readonly'));
+    await campo.fill(valor);
+    await campo.press('Tab');
+    await expect(campo).toHaveValue(valor);
+  }
 }

@@ -58,9 +58,6 @@ test.describe('Plano de Trabalho Financeiro - repercussão financeira @execucao 
     await recursosUfg.preencher();
 
     // Quadro de pessoal
-    await page
-      .getByRole('combobox', { name: 'Tipos de participantes relacionados a este Plano de Trabalho Financeiro' })
-      .click({ force: true });
     const quadroPessoal = new QuadroPessoalPage(page);
     await quadroPessoal.adicionarBolsista('990000');
     await quadroPessoal.validarEAvancar();

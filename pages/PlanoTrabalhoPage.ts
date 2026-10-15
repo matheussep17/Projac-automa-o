@@ -21,18 +21,21 @@ export class PlanoTrabalhoPage {
   }
 
   async conferirESalvar(): Promise<void> {
-    await this.page
-      .getByRole('button', {
-        name: 'Conferir Dados',
-        exact: true,
-      })
-      .click();
+    const conferirDados = this.page.getByRole('button', {
+      name: 'Conferir Dados',
+      exact: true,
+    });
+    const conferencia = this.page.getByRole('heading', {
+      name: 'Conferência de Dados',
+      exact: true,
+    });
 
-    await expect(
-      this.page.getByRole('heading', {
-        name: 'Conferência de Dados',
-      }),
-    ).toBeVisible();
+    // Alguns cenários avançam diretamente para a conferência.
+    await expect(conferencia.or(conferirDados).first()).toBeVisible();
+    if (!(await conferencia.isVisible())) {
+      await conferirDados.click();
+    }
+    await expect(conferencia).toBeVisible();
 
     await this.page
       .getByRole('button', {
