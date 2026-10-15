@@ -26,11 +26,10 @@ export class PlanoTrabalhoPage {
       exact: true,
     });
     const conferencia = this.page.getByRole('heading', {
-      name: 'Conferência de Dados',
+      name: /Confer.*ncia de Dados/i,
       exact: true,
     });
 
-    // Alguns cenários avançam diretamente para a conferência.
     await expect(conferencia.or(conferirDados).first()).toBeVisible();
     if (!(await conferencia.isVisible())) {
       await conferirDados.click();
@@ -48,5 +47,20 @@ export class PlanoTrabalhoPage {
         exact: true,
       }),
     ).toBeVisible();
+  }
+
+  async salvarRascunho(): Promise<void> {
+    const salvarRascunho = this.page.getByRole('button', {
+      name: /salvar.*rascunho|rascunho.*salvar/i,
+    });
+
+    await expect(salvarRascunho).toBeVisible();
+    await salvarRascunho.click();
+    await expect(
+      this.page.getByText(/rascunho.*salvo|salvo.*rascunho/i).first(),
+    ).toBeVisible();
+    await expect(
+      this.page.getByRole('heading', { name: /Confer/ }),
+    ).toHaveCount(0);
   }
 }
