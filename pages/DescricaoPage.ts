@@ -9,6 +9,23 @@ export class DescricaoPage {
   constructor(private readonly page: Page) {}
 
   async preencher(config: ConfiguracaoDescricao): Promise<void> {
+    const usuariosAssistentes = this.page.getByRole('combobox', {
+      name: 'Usuários assistentes',
+    });
+    await usuariosAssistentes.click();
+    await usuariosAssistentes.fill('');
+    await usuariosAssistentes.pressSequentially('isabela de souza neiva');
+    const isabelaTerceirizada = this.page.getByRole('option', {
+      name: /Isabela De Souza Neiva \(65357 - SERV[IÍ]CO TERCEIRIZADO\)/i,
+    });
+    await expect(isabelaTerceirizada).toBeVisible({ timeout: 15_000 });
+    await isabelaTerceirizada.click();
+    await expect(
+      this.page.getByText('Isabela De Souza Neiva', {
+        exact: true,
+      }),
+    ).toBeVisible();
+
     if (config.emExecucao) {
       await this.page.getByRole('checkbox', { name: 'Plano de Trabalho Financeiro em Execução' }).check();
     } else {
