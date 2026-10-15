@@ -34,7 +34,7 @@ export class QuadroPessoalPage {
     await expect(nomeParticipante).toHaveValue(/Abadia Dos Reis Nascimento/);
 
     const escolaridade = dialog.getByRole('combobox', { name: 'Escolaridade e/ou Experiência' });
-    await this.selecionarOpcao(escolaridade, 'Ensino Superior');
+    await this.selecionarOpcao(escolaridade, /^(Ensino Superior|Superior Completo)$/);
 
     await dialog.getByLabel('Quantidade de meses').fill('1');
     const periodo = dialog.getByRole('group', { name: 'Período *' });
