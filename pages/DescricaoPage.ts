@@ -16,7 +16,7 @@ export class DescricaoPage {
     await usuariosAssistentes.fill('');
     await usuariosAssistentes.pressSequentially('isabela de souza neiva');
     const isabelaTerceirizada = this.page.getByRole('option', {
-      name: /Isabela De Souza Neiva \(65357 - SERV[IÍ]CO TERCEIRIZADO\)/i,
+      name: /Isabela De Souza Neiva\s*\(65357\s*-\s*Servi(?:ço|co)\s+Terceirizado\)/i,
     });
     await expect(isabelaTerceirizada).toBeVisible({ timeout: 15_000 });
     await isabelaTerceirizada.click();
