@@ -11,6 +11,8 @@ import { CronogramaPage } from '../pages/CronogramaPage';
 import { IndicadorMetaPage } from '../pages/IndicadorMetaPage';
 import { DesembolsoPage } from '../pages/DesembolsoPage';
 import { RecursosUfgPage } from '../pages/RecursosUfgPage';
+import { sharedData } from '../test-data/shared.data';
+import { quadroPessoalData } from '../test-data/quadro-pessoal.data';
 
 test.describe('Plano de Trabalho Financeiro - sem fundação @fora-execucao @sem-fundacao', () => {
   test('deve preencher, conferir e salvar o plano sem fundação @smoke', async ({ page }) => {
@@ -29,7 +31,7 @@ test.describe('Plano de Trabalho Financeiro - sem fundação @fora-execucao @sem
     // Dados do(a) Coordenador(a)
     const coordenacaoAprovacao = new CoordenacaoAprovacaoPage(page);
     await coordenacaoAprovacao.preencherViceCoordenador();
-    await expect(page.getByLabel('Matrícula SIAPE vice-coordenador(a)')).toHaveValue('1866324');
+    await expect(page.getByLabel('Matrícula SIAPE vice-coordenador(a)')).toHaveValue(sharedData.matriculaViceCoordenador);
     await coordenacaoAprovacao.preencherAprovacao(pdf);
     await coordenacaoAprovacao.avancar();
 
@@ -59,7 +61,7 @@ test.describe('Plano de Trabalho Financeiro - sem fundação @fora-execucao @sem
 
     // Quadro de pessoal
     const quadroPessoal = new QuadroPessoalPage(page);
-    await quadroPessoal.adicionarBolsista('1000000');
+    await quadroPessoal.adicionarBolsista(quadroPessoalData.valorSemFundacao);
     await quadroPessoal.validarEAvancar();
 
     // Tratamento tributário

@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { encargosData } from '../test-data/encargos';
 
 test.describe('CT01 - Cadastro, edição e exclusão de encargo trabalhista', () => {
   test('deve cadastrar, editar e excluir um encargo trabalhista', async ({ page }) => {
@@ -14,8 +15,8 @@ test.describe('CT01 - Cadastro, edição e exclusão de encargo trabalhista', ()
     await page.getByLabel('Benefício/gratificação', { exact: true }).fill(nomeInicial);
     await page.getByLabel('Fundação', { exact: true }).click();
     await page.getByRole('option', { name: 'Fundação de Apoio à Pesquisa', exact: true }).click();
-    await page.getByLabel('Valor R$', { exact: true }).fill('123,45');
-    await page.getByLabel('Ano de referência', { exact: true }).fill('2026');
+    await page.getByLabel('Valor R$', { exact: true }).fill(encargosData.valorInicial);
+    await page.getByLabel('Ano de referência', { exact: true }).fill(encargosData.anoReferencia);
     await page.getByRole('button', { name: 'Salvar', exact: true }).click();
 
     await expect(page.getByText('Benefício cadastrado(a) com sucesso!')).toBeVisible();
@@ -25,7 +26,7 @@ test.describe('CT01 - Cadastro, edição e exclusão de encargo trabalhista', ()
     // Edição
     await linhaCriada.getByRole('button', { name: 'Editar', exact: true }).click();
     await page.getByLabel('Benefício/gratificação', { exact: true }).fill(nomeEditado);
-    await page.getByLabel('Valor R$', { exact: true }).fill('234,56');
+    await page.getByLabel('Valor R$', { exact: true }).fill(encargosData.valorEditado);
     await page.getByRole('button', { name: 'Salvar', exact: true }).click();
 
     await expect(page.getByText('Benefício alterado(a) com sucesso!')).toBeVisible();

@@ -1,4 +1,5 @@
 import { expect, Page } from '@playwright/test';
+import { tratamentoTributarioData } from '../test-data/tratamento-tributario.data';
 
 export class TratamentoTributarioPage {
   constructor(private readonly page: Page) {}
@@ -22,7 +23,7 @@ export class TratamentoTributarioPage {
     await expect(modalidade).toHaveText('Ensino - Resolução 83 - 2021');
     await this.page
       .getByLabel('Justificativa')
-      .fill('Tratamento tributário definido conforme a modalidade de bolsa e a natureza do projeto.');
+      .fill(tratamentoTributarioData.justificativa);
     await this.page.keyboard.press('Escape');
     await this.page.getByRole('button', { name: 'Próxima Etapa' }).click({ force: true });
   }

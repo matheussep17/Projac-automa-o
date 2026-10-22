@@ -11,6 +11,8 @@ import { CronogramaPage } from '../pages/CronogramaPage';
 import { IndicadorMetaPage } from '../pages/IndicadorMetaPage';
 import { DesembolsoPage } from '../pages/DesembolsoPage';
 import { RecursosUfgPage } from '../pages/RecursosUfgPage';
+import { sharedData } from '../test-data/shared.data';
+import { quadroPessoalData } from '../test-data/quadro-pessoal.data';
 
 test.describe('Plano de Trabalho Financeiro - repercussão financeira @fora-execucao @fundacao', () => {
   test('deve preencher, conferir e salvar o plano de trabalho financeiro @smoke', async ({ page }) => {
@@ -29,7 +31,7 @@ test.describe('Plano de Trabalho Financeiro - repercussão financeira @fora-exec
     // Dados do(a) Coordenador(a)
     const coordenacaoAprovacao = new CoordenacaoAprovacaoPage(page);
     await coordenacaoAprovacao.preencherViceCoordenador();
-    await expect(page.getByLabel('Matrícula SIAPE vice-coordenador(a)')).toHaveValue('1866324');
+    await expect(page.getByLabel('Matrícula SIAPE vice-coordenador(a)')).toHaveValue(sharedData.matriculaViceCoordenador);
     await coordenacaoAprovacao.preencherAprovacao(pdf);
     await coordenacaoAprovacao.avancar();
 
@@ -58,7 +60,7 @@ test.describe('Plano de Trabalho Financeiro - repercussão financeira @fora-exec
 
     // Quadro de pessoal
     const quadroPessoal = new QuadroPessoalPage(page);
-    await quadroPessoal.adicionarBolsista('990000');
+    await quadroPessoal.adicionarBolsista(quadroPessoalData.valorComFundacao);
     await quadroPessoal.validarEAvancar();
 
     // Tratamento tributário

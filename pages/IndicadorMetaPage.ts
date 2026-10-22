@@ -1,11 +1,12 @@
 import { expect, Page } from '@playwright/test';
+import { indicadorMetaData } from '../test-data/indicador-meta.data';
 
 export class IndicadorMetaPage {
   constructor(private readonly page: Page) {}
 
   async adicionarIndicador(): Promise<void> {
     await this.page.getByRole('button', { name: 'Adicionar' }).click();
-    await this.page.getByRole('textbox', { name: 'Meta', exact: true }).fill('Concluir a etapa de pesquisa');
+    await this.page.getByRole('textbox', { name: 'Meta', exact: true }).fill(indicadorMetaData.meta);
     const etapas = this.page.getByRole('dialog').getByRole('combobox', {
       name: 'Etapas Cronograma',
       exact: true,
@@ -21,7 +22,7 @@ export class IndicadorMetaPage {
     await expect(etapas).toHaveAttribute('aria-expanded', 'false');
     await this.page
       .getByRole('textbox', { name: 'Indicador de cumprimento das metas', exact: true })
-      .fill('Percentual de execução da etapa');
+      .fill(indicadorMetaData.indicador);
     await this.page.getByRole('dialog').getByRole('button', { name: 'Adicionar' }).click();
     await this.page.getByRole('button', { name: 'Próxima Etapa' }).click();
   }

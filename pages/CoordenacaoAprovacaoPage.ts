@@ -1,4 +1,5 @@
 import { Page } from '@playwright/test';
+import { sharedData } from '../test-data/shared.data';
 
 export class CoordenacaoAprovacaoPage {
   constructor(private readonly page: Page) {}
@@ -7,9 +8,9 @@ export class CoordenacaoAprovacaoPage {
     await this.page.getByRole('tab', { name: 'Dados do(a) Coordenador(a)' }).click();
     await this.page.getByRole('combobox', { name: 'Vice-Coordenador(a)' }).click({ force: true });
     await this.page.getByRole('option').first().click();
-    await this.page.getByLabel('Matrícula SIAPE vice-coordenador(a)').fill('1866324');
-    await this.page.getByLabel('E-mail vice-coordenador(a)').fill('vice.coordenador@ufg.br');
-    await this.page.getByLabel('Telefone vice-coordenador(a)').fill('62988888888');
+    await this.page.getByLabel('Matrícula SIAPE vice-coordenador(a)').fill(sharedData.matriculaViceCoordenador);
+    await this.page.getByLabel('E-mail vice-coordenador(a)').fill(sharedData.emailViceCoordenador);
+    await this.page.getByLabel('Telefone vice-coordenador(a)').fill(sharedData.telefoneViceCoordenador);
   }
 
   async preencherAprovacao(arquivo: string): Promise<void> {

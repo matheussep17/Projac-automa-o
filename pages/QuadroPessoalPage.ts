@@ -1,4 +1,6 @@
 import { expect, Locator, Page } from '@playwright/test';
+import { quadroPessoalData } from '../test-data/quadro-pessoal.data';
+import { sharedData } from '../test-data/shared.data';
 
 export class QuadroPessoalPage {
   constructor(private readonly page: Page) {}
@@ -25,9 +27,9 @@ export class QuadroPessoalPage {
 
     const nomeParticipante = dialog.getByRole('combobox', { name: 'Nome do participante' });
     await expect(nomeParticipante).toBeEnabled({ timeout: 10_000 });
-    await nomeParticipante.fill('Abadia Dos Reis Nascimento');
+    await nomeParticipante.fill(quadroPessoalData.bolsista);
     const participante = this.page.getByRole('listbox').getByRole('option', {
-      name: /1866324\s*-\s*Abadia Dos Reis Nascimento/,
+      name: new RegExp(`${sharedData.matriculaViceCoordenador}\\s*-\\s*${quadroPessoalData.bolsista}`),
     });
     await expect(participante).toBeVisible({ timeout: 10_000 });
     await participante.click();
@@ -36,17 +38,17 @@ export class QuadroPessoalPage {
     const escolaridade = dialog.getByRole('combobox', { name: 'Escolaridade e/ou Experiência' });
     await this.selecionarOpcao(escolaridade, /^(Ensino Superior|Superior Completo)$/);
 
-    await dialog.getByLabel('Quantidade de meses').fill('1');
+    await dialog.getByLabel('Quantidade de meses').fill(quadroPessoalData.quantidadeMeses);
     const periodo = dialog.getByRole('group', { name: 'Período *' });
     const periodoInicio = periodo.locator('input:visible').first();
-    await this.preencherPeriodo(periodoInicio, '10/2026');
+    await this.preencherPeriodo(periodoInicio, quadroPessoalData.periodo);
     const periodoFim = periodo.locator('input:visible').last();
-    await this.preencherPeriodo(periodoFim, '10/2026');
-    await expect(periodoInicio).toHaveValue('10/2026');
-    await expect(periodoFim).toHaveValue('10/2026');
+    await this.preencherPeriodo(periodoFim, quadroPessoalData.periodo);
+    await expect(periodoInicio).toHaveValue(quadroPessoalData.periodo);
+    await expect(periodoFim).toHaveValue(quadroPessoalData.periodo);
 
-    await dialog.getByLabel('Quantidade de bolsas').fill('1');
-    await dialog.getByLabel('Carga horária mensal').fill('20');
+    await dialog.getByLabel('Quantidade de bolsas').fill(quadroPessoalData.quantidadeBolsas);
+    await dialog.getByLabel('Carga horária mensal').fill(quadroPessoalData.cargaHorariaMensal);
     const valor = dialog.getByLabel('Valor mensal');
     await valor.fill('');
     await valor.pressSequentially(valorMensal);
@@ -66,10 +68,10 @@ export class QuadroPessoalPage {
 
     await this.page
       .getByLabel('Justificar os valores dos salários indicando os seus referenciais:')
-      .fill('Valor definido conforme a disponibilidade da sub-rubrica de Bolsas.');
+      .fill(quadroPessoalData.justificativaBolsas);
     await this.page
       .getByLabel('Relatar a forma de seleção dos bolsistas:')
-      .fill('Seleção realizada conforme os critérios acadêmicos e institucionais do projeto.');
+      .fill(quadroPessoalData.criteriosSelecao);
   }
 
   async validarEAvancar(): Promise<void> {
@@ -103,7 +105,7 @@ export class QuadroPessoalPage {
   private linhaBolsista(): Locator {
     return this.page
       .getByRole('row')
-      .filter({ hasText: 'Abadia Dos Reis Nascimento' })
+      .filter({ hasText: quadroPessoalData.bolsista })
       .filter({ hasText: 'Bolsista' });
   }
 

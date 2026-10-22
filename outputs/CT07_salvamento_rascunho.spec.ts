@@ -12,6 +12,8 @@ import { CronogramaPage } from '../pages/CronogramaPage';
 import { IndicadorMetaPage } from '../pages/IndicadorMetaPage';
 import { DesembolsoPage } from '../pages/DesembolsoPage';
 import { RecursosUfgPage } from '../pages/RecursosUfgPage';
+import { sharedData } from '../test-data/shared.data';
+import { quadroPessoalData } from '../test-data/quadro-pessoal.data';
 
 test.describe('Plano de Trabalho Financeiro - cadastro completo como rascunho', () => {
   test('deve preencher o cadastro completo e salvar apenas o rascunho @smoke', async ({ page }) => {
@@ -27,7 +29,7 @@ test.describe('Plano de Trabalho Financeiro - cadastro completo como rascunho', 
     await coordenacaoAprovacao.preencherViceCoordenador();
     await expect(
       page.getByLabel(/Matr.*cula SIAPE vice-coordenador\(a\)/i),
-    ).toHaveValue('1866324');
+    ).toHaveValue(sharedData.matriculaViceCoordenador);
     await coordenacaoAprovacao.preencherAprovacao(pdf);
     await coordenacaoAprovacao.avancar();
 
@@ -51,7 +53,7 @@ test.describe('Plano de Trabalho Financeiro - cadastro completo como rascunho', 
     await recursosUfg.preencher();
 
     const quadroPessoal = new QuadroPessoalPage(page);
-    await quadroPessoal.adicionarBolsista('990000');
+    await quadroPessoal.adicionarBolsista(quadroPessoalData.valorComFundacao);
     await quadroPessoal.validarEAvancar();
 
     const tratamentoTributario = new TratamentoTributarioPage(page);

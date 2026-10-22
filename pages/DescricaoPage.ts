@@ -1,4 +1,6 @@
 import { expect, Page } from '@playwright/test';
+import { sharedData } from '../test-data/shared.data';
+import { descricaoData } from '../test-data/descricao';
 
 export type ConfiguracaoDescricao = {
   emExecucao: boolean;
@@ -14,14 +16,14 @@ export class DescricaoPage {
     });
     await usuariosAssistentes.click();
     await usuariosAssistentes.fill('');
-    await usuariosAssistentes.pressSequentially('isabela de souza neiva');
+    await usuariosAssistentes.pressSequentially(descricaoData.usuarioAssistenteBusca);
     const isabelaTerceirizada = this.page.getByRole('option', {
       name: /Isabela De Souza Neiva\s*\(65357\s*-\s*Servi(?:ço|co)\s+Terceirizado\)/i,
     });
     await expect(isabelaTerceirizada).toBeVisible({ timeout: 15_000 });
     await isabelaTerceirizada.click();
     await expect(
-      this.page.getByText('Isabela De Souza Neiva', {
+      this.page.getByText(descricaoData.usuarioAssistenteNome, {
         exact: true,
       }),
     ).toBeVisible();
@@ -36,7 +38,7 @@ export class DescricaoPage {
 
     await this.page
       .getByLabel('Objetivo(s) do Plano de Trabalho Financeiro')
-      .fill('Executar atividades de pesquisa e desenvolvimento para aprimoramento institucional.');
+      .fill(descricaoData.objetivo);
     await this.page.getByLabel('Entidade financiadora').click({ force: true });
     const bancoDoBrasil = this.page.getByRole('option', {
       name: 'Banco do Brasil',
@@ -54,7 +56,7 @@ export class DescricaoPage {
     }
     const valor = this.page.getByLabel('Valor disponibilizado para o Plano de Trabalho');
     await valor.fill('');
-    await valor.pressSequentially('1000000');
+    await valor.pressSequentially(sharedData.valorPlano);
     await expect(valor).toHaveValue(/10\.000,00/);
     await this.page.getByRole('radio', { name: 'Público', exact: true }).check();
 
@@ -75,14 +77,14 @@ export class DescricaoPage {
       await expect(this.page.getByLabel('Fundação', { exact: true })).toBeHidden();
     }
 
-    await this.page.getByLabel('Início previsto').fill('07/10/2026');
-    await this.page.getByLabel('Término previsto').fill('31/12/2026');
+    await this.page.getByLabel('Início previsto').fill(sharedData.inicio);
+    await this.page.getByLabel('Término previsto').fill(sharedData.fim);
   }
 
   async preencherDadosInstitucionais(): Promise<void> {
     await this.page.getByRole('radio', { name: 'Sim', exact: true }).last().check();
-    await this.page.getByLabel('Referencial do valor da bolsa pelo concedente').fill('500');
-    await this.page.getByLabel('Telefone Institucional').fill('5562999999999');
+    await this.page.getByLabel('Referencial do valor da bolsa pelo concedente').fill(descricaoData.referencialBolsa);
+    await this.page.getByLabel('Telefone Institucional').fill(descricaoData.telefoneInstitucional);
     await this.page.getByRole('button', { name: 'Próxima Etapa' }).click();
   }
 }
