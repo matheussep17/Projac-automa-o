@@ -7,17 +7,20 @@ export class ProjetoPage {
     await this.page.getByRole('tab', { name: 'Dados do Projeto' }).click();
     const natureza = this.page.getByRole('combobox', { name: 'Natureza' });
     const pesquisa = this.page.getByRole('option', { name: 'Pesquisa', exact: true });
-    for (let tentativa = 0; tentativa < 3; tentativa++) {
+    let naturezaAberta = false;
+    for (let tentativa = 0; tentativa < 3 && !naturezaAberta; tentativa += 1) {
       await natureza.click();
       await natureza.press('ArrowDown');
-      if (await pesquisa.isVisible().catch(() => false)) break;
-      await this.page.waitForTimeout(500);
+      naturezaAberta = await pesquisa.isVisible().catch(() => false);
     }
     await expect(pesquisa).toBeVisible({ timeout: 10_000 });
     await pesquisa.click();
-    await this.page.getByRole('combobox', { name: 'Projeto' }).click();
-    await this.page.getByRole('option').first().click();
-    await expect(this.page.getByRole('combobox', { name: 'Projeto' })).toHaveValue(/.+/);
+    const projeto = this.page.getByRole('combobox', { name: 'Projeto' });
+    await projeto.click();
+    const primeiraOpcaoProjeto = this.page.getByRole('option').first();
+    await expect(primeiraOpcaoProjeto).toBeVisible();
+    await primeiraOpcaoProjeto.click();
+    await expect(projeto).toHaveValue(/.+/);
   }
 
   async anexarExtrato(arquivo: string): Promise<void> {

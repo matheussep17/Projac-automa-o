@@ -15,7 +15,7 @@ import { RecursosUfgPage } from '../pages/RecursosUfgPage';
 import { sharedData } from '../test-data/shared.data';
 import { quadroPessoalData } from '../test-data/quadro-pessoal.data';
 
-test.describe('Plano de Trabalho Financeiro - cadastro completo como rascunho', () => {
+test.describe('Plano de Trabalho Financeiro - cadastro completo como rascunho com fundação', () => {
   test('deve preencher o cadastro completo e salvar apenas o rascunho @smoke', async ({ page }) => {
     const pdf = path.resolve('work/anexo-teste.pdf');
     const plano = new PlanoTrabalhoPage(page);

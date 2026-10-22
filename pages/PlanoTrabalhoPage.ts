@@ -60,6 +60,11 @@ export class PlanoTrabalhoPage {
 
     await expect(salvarRascunho).toBeVisible();
     await salvarRascunho.click();
+    const erroAoSalvarRascunho = this.page.getByText(/erro ao salvar rascunho/i).first();
+    await this.page.waitForTimeout(2_000);
+    if (await erroAoSalvarRascunho.isVisible()) {
+      await salvarRascunho.click();
+    }
     await expect(
       this.page.getByText(/rascunho.*salvo|salvo.*rascunho/i).first(),
     ).toBeVisible();

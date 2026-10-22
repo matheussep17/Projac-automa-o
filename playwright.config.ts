@@ -13,16 +13,16 @@ export default defineConfig({
 
   globalSetup: './fixtures/auth.setup.ts',
 
-  testDir: './outputs',
+  testDir: './e2e',
 
   testMatch: [
-    '**/CT02_cadastro_execucao_com_fundacao.spec.ts',
-    '**/CT03_cadastro_execucao_sem_fundacao.spec.ts',
-    '**/CT04_cadastro_fora_execucao_com_fundacao.spec.ts',
-    '**/CT05_cadastro_fora_execucao_sem_fundacao.spec.ts',
-    '**/CT06_validacoes_obrigatorias.spec.ts',
-    '**/CT07_salvamento_rascunho.spec.ts',
-    '**/CT08_salvamento_rascunho_sem_fundacao.spec.ts',
+    '**/CT01_cadastro_execucao_com_fundacao.spec.ts',
+    '**/CT02_cadastro_execucao_sem_fundacao.spec.ts',
+    '**/CT03_cadastro_fora_execucao_com_fundacao.spec.ts',
+    '**/CT04_cadastro_fora_execucao_sem_fundacao.spec.ts',
+    '**/CT05_validacoes_obrigatorias.spec.ts',
+    '**/CT06_salvamento_rascunho_com_fundacao.spec.ts',
+    '**/CT07_salvamento_rascunho_sem_fundacao.spec.ts',
   ],
 
   fullyParallel: false,
@@ -37,6 +37,7 @@ export default defineConfig({
 
   use: {
     ...devices['Desktop Chrome'],
+    headless: false,
     baseURL,
     storageState: `playwright/.auth/${environment}.json`,
     trace: 'retain-on-failure',

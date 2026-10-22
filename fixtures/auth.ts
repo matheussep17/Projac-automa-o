@@ -11,11 +11,13 @@ const HOME = `${BASE_URL}/projac/`;
 
 export async function loginAsTae(page: Page): Promise<void> {
   await page.goto(HOME, { waitUntil: 'domcontentloaded' });
-  await page.waitForTimeout(1000);
-
   const loginField = page.getByRole('textbox', {
     name: 'Informe seu login',
   });
+
+  await expect(
+    loginField.or(page.getByRole('button', { name: /Example icon-button/ })),
+  ).toBeVisible({ timeout: 15_000 });
 
   if (await loginField.isVisible().catch(() => false)) {
     const cookieButton = page.getByRole('button', {
