@@ -17,6 +17,7 @@ export class ProjetoPage {
     await pesquisa.click();
     const projeto = this.page.getByRole('combobox', { name: 'Projeto' });
     await projeto.click();
+    // O projeto é definido pelo primeiro resultado retornado pelo ambiente de teste.
     const primeiraOpcaoProjeto = this.page.getByRole('option').first();
     await expect(primeiraOpcaoProjeto).toBeVisible();
     await primeiraOpcaoProjeto.click();

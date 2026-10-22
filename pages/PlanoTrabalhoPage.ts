@@ -12,6 +12,7 @@ export class PlanoTrabalhoPage {
       .getByText('Cadastrar Plano de Trabalho Financeiro', {
         exact: true,
       })
+      // O card expõe o mesmo texto no span interno e no conteúdo do card.
       .first()
       .click();
 
@@ -41,9 +42,11 @@ export class PlanoTrabalhoPage {
     });
     await salvar.click();
     const erroAoSalvarRegistro = this.page.getByText(/erro ao salvar registro/i).first();
-    await this.page.waitForTimeout(2_000);
-    if (await erroAoSalvarRegistro.isVisible()) {
+    try {
+      await expect(erroAoSalvarRegistro).toBeVisible({ timeout: 2_000 });
       await salvar.click();
+    } catch {
+      // Nenhum erro apareceu no período de observação; segue para a confirmação de sucesso.
     }
 
     await expect(
@@ -61,9 +64,11 @@ export class PlanoTrabalhoPage {
     await expect(salvarRascunho).toBeVisible();
     await salvarRascunho.click();
     const erroAoSalvarRascunho = this.page.getByText(/erro ao salvar rascunho/i).first();
-    await this.page.waitForTimeout(2_000);
-    if (await erroAoSalvarRascunho.isVisible()) {
+    try {
+      await expect(erroAoSalvarRascunho).toBeVisible({ timeout: 2_000 });
       await salvarRascunho.click();
+    } catch {
+      // Nenhum erro apareceu no período de observação; segue para a confirmação de sucesso.
     }
     await expect(
       this.page.getByText(/rascunho.*salvo|salvo.*rascunho/i).first(),

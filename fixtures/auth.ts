@@ -68,7 +68,7 @@ export async function loginAsTae(page: Page): Promise<void> {
   }
 
   await expect(
-    page.getByText('Centro De Recursos Computacionais').first(),
+    page.getByText('Centro De Recursos Computacionais', { exact: true }),
   ).toBeVisible();
 
   await expect(menuButton).toContainText('Tae');

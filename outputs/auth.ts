@@ -46,7 +46,9 @@ export async function loginAsTae(page: Page): Promise<void> {
     await tae.check();
   }
 
-  await expect(page.getByText('Centro De Recursos Computacionais').first()).toBeVisible();
+  await expect(
+    page.getByText('Centro De Recursos Computacionais', { exact: true }),
+  ).toBeVisible();
   await expect(menuButton).toContainText('Tae');
 
   // Fecha o menu de perfil para não deixar o backdrop bloquear os testes.
