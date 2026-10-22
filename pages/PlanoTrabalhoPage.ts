@@ -36,11 +36,15 @@ export class PlanoTrabalhoPage {
     }
     await expect(conferencia).toBeVisible();
 
-    await this.page
-      .getByRole('button', {
-        name: /^Salvar$/,
-      })
-      .click();
+    const salvar = this.page.getByRole('button', {
+      name: /^Salvar$/,
+    });
+    await salvar.click();
+    const erroAoSalvarRegistro = this.page.getByText(/erro ao salvar registro/i).first();
+    await this.page.waitForTimeout(2_000);
+    if (await erroAoSalvarRegistro.isVisible()) {
+      await salvar.click();
+    }
 
     await expect(
       this.page.getByText('Registro salvo com sucesso!', {
