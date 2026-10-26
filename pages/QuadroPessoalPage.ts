@@ -5,7 +5,7 @@ import { sharedData } from '../test-data/shared.data';
 export class QuadroPessoalPage {
   constructor(private readonly page: Page) {}
 
-  async adicionarBolsista(valorMensal: string): Promise<void> {
+  async adicionarBolsista(valorMensal: string, comParticipante = true): Promise<void> {
     const tipoParticipante = this.page.getByRole('combobox', {
       name: 'Tipos de participantes relacionados a este Plano de Trabalho Financeiro',
     });
@@ -25,18 +25,17 @@ export class QuadroPessoalPage {
     const beneficiario = dialog.getByRole('combobox', { name: 'Beneficiário' });
     await this.selecionarOpcao(beneficiario, 'Servidor');
 
-    const nomeParticipante = dialog.getByRole('combobox', { name: 'Nome do participante' });
-    await expect(nomeParticipante).toBeEnabled({ timeout: 10_000 });
-    await nomeParticipante.fill(quadroPessoalData.bolsista);
-    const participante = this.page.getByRole('listbox').getByRole('option', {
-      name: new RegExp(`${sharedData.matriculaViceCoordenador}\\s*-\\s*${quadroPessoalData.bolsista}`),
-    });
-    await expect(participante).toBeVisible({ timeout: 10_000 });
-    await participante.click();
-    await expect(nomeParticipante).toHaveValue(/Abadia Dos Reis Nascimento/);
-
-    const escolaridade = dialog.getByRole('combobox', { name: 'Escolaridade e/ou Experiência' });
-    await this.selecionarOpcao(escolaridade, /^(Ensino Superior|Superior Completo)$/);
+    if (comParticipante) {
+      const nomeParticipante = dialog.getByRole('combobox', { name: 'Nome do participante' });
+      await expect(nomeParticipante).toBeEnabled({ timeout: 10_000 });
+      await nomeParticipante.fill(quadroPessoalData.bolsista);
+      const participante = this.page.getByRole('listbox').getByRole('option', {
+        name: new RegExp(`${sharedData.matriculaViceCoordenador}\\s*-\\s*${quadroPessoalData.bolsista}`),
+      });
+      await expect(participante).toBeVisible({ timeout: 10_000 });
+      await participante.click();
+      await expect(nomeParticipante).toHaveValue(/Abadia Dos Reis Nascimento/);
+    }
 
     await dialog.getByLabel('Quantidade de meses').fill(quadroPessoalData.quantidadeMeses);
     const periodo = dialog.getByRole('group', { name: 'Período *' });
@@ -64,7 +63,7 @@ export class QuadroPessoalPage {
 
     await dialog.getByRole('button', { name: 'Adicionar', exact: true }).click();
     await expect(dialog).toBeHidden({ timeout: 10_000 });
-    await expect(this.linhaBolsista()).toContainText('20 mensal');
+    await expect(this.linhaBolsista(comParticipante)).toContainText('20 mensal');
 
     await this.page
       .getByLabel('Justificar os valores dos salários indicando os seus referenciais:')
@@ -74,8 +73,8 @@ export class QuadroPessoalPage {
       .fill(quadroPessoalData.criteriosSelecao);
   }
 
-  async validarEAvancar(): Promise<void> {
-    await expect(this.linhaBolsista()).toContainText('20 mensal');
+  async validarEAvancar(comParticipante = true): Promise<void> {
+    await expect(this.linhaBolsista(comParticipante)).toContainText('20 mensal');
     await this.page.getByRole('button', { name: 'Próxima Etapa' }).click();
   }
 
@@ -102,11 +101,11 @@ export class QuadroPessoalPage {
     await expect(combobox).toContainText(nomeOpcao, { timeout: 10_000 });
   }
 
-  private linhaBolsista(): Locator {
-    return this.page
+  private linhaBolsista(comParticipante = true): Locator {
+    const linha = this.page
       .getByRole('row')
-      .filter({ hasText: quadroPessoalData.bolsista })
       .filter({ hasText: 'Bolsista' });
+    return comParticipante ? linha.filter({ hasText: quadroPessoalData.bolsista }) : linha;
   }
 
   private escaparRegex(valor: string): string {

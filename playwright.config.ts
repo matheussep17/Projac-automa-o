@@ -23,6 +23,7 @@ export default defineConfig({
     '**/CT05_validacoes_obrigatorias.spec.ts',
     '**/CT06_salvamento_rascunho_com_fundacao.spec.ts',
     '**/CT07_salvamento_rascunho_sem_fundacao.spec.ts',
+    '**/CT08_cadastro_fora_execucao_sem_participante.spec.ts',
   ],
 
   fullyParallel: false,
