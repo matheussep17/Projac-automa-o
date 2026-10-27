@@ -107,11 +107,19 @@ export class PlanoTrabalhoPage {
     await expect(this.page.getByText('Documento Contratual', { exact: true }).last()).toBeVisible();
   }
 
-  async filtrarPlanoEmExecucao(): Promise<void> {
+  async filtrarPlanoEmExecucao(codigo?: string): Promise<void> {
+    const botaoFiltros = this.page.getByRole('button', { name: 'Filtros', exact: true });
+    if (await botaoFiltros.isVisible().catch(() => false)) {
+      await botaoFiltros.click();
+    }
     const filtro = this.page.getByRole('combobox', { name: /filtro|situação|status/i }).first();
     if (await filtro.count()) {
       await filtro.click();
       await this.page.getByRole('option', { name: /em execução/i }).click();
+      if (codigo) {
+        await expect(this.page.getByRole('table').first().getByRole('row').filter({ hasText: codigo }).first())
+          .toContainText(/em .*execu/i);
+      }
     }
   }
 }

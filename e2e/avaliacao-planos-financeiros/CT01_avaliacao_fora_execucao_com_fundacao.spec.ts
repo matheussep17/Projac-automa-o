@@ -30,6 +30,6 @@ test('CT01 - avalia plano fora de execução com fundação @avaliacao @fora-exe
   await plano.editarPlanoPorCodigo(codigoPlano);
   await new DocumentoContratualPage(page).adicionarAcordoDeParceria(processoSei);
   await plano.conferirESalvar();
-  await plano.filtrarPlanoEmExecucao();
+  await plano.filtrarPlanoEmExecucao(codigoPlano);
   await expect(page.getByText(/em execução/i).first()).toBeVisible();
 });
