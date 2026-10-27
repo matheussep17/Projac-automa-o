@@ -77,4 +77,45 @@ export class PlanoTrabalhoPage {
       this.page.getByRole('heading', { name: /Confer/ }),
     ).toHaveCount(0);
   }
+
+  async editarPlanoPorCodigo(codigo: string): Promise<void> {
+    await this.page.goto('/projac/plano-trabalho-financeiro');
+    await this.page.getByText(/Gerenciar.*Repercussão|Gerenciar Plano de Trabalho Financeiro/i).first().click();
+    await expect(this.page.getByRole('table').first()).toBeVisible();
+    await expect(this.page.getByRole('table').first()).not.toContainText('CARREGANDO', { timeout: 15_000 });
+    await this.page.getByRole('button', { name: 'Filtros', exact: true }).click();
+    const filtro = this.page.getByRole('textbox', { name: /código.*plano|c[oó]digo/i }).first();
+    await expect(filtro).toBeVisible();
+    await filtro.fill(codigo);
+    await filtro.press('Enter');
+    await expect(this.page.getByRole('table').first()).not.toContainText('CARREGANDO', { timeout: 15_000 });
+    const tabela = this.page.getByRole('table').first();
+    let linha = tabela.getByRole('row').filter({ hasText: codigo }).first();
+    const proxima = this.page.getByRole('button', { name: /Próxima Página|próxima|next/i });
+    while (!(await linha.count()) && await proxima.isVisible().catch(() => false) && !(await proxima.isDisabled().catch(() => true))) {
+      await proxima.click();
+      await expect(tabela).not.toContainText('CARREGANDO', { timeout: 15_000 });
+      linha = tabela.getByRole('row').filter({ hasText: codigo }).first();
+    }
+    await expect(linha).toBeVisible({ timeout: 10_000 });
+    const realizarEdicao = linha.getByRole('button', { name: /Realizar EdiÃ§Ã£o|Realizar Edição/i });
+    if (await realizarEdicao.isEnabled().catch(() => false)) {
+      await realizarEdicao.click();
+    } else {
+      await linha.getByRole('button', { name: /editar|visualizar/i }).first().click();
+    }
+    const editar = this.page.getByRole('button', { name: /editar/i }).first();
+    if (await editar.isVisible().catch(() => false)) {
+      await editar.click();
+    }
+    await expect(this.page.getByText('Documento Contratual', { exact: true }).last()).toBeVisible();
+  }
+
+  async filtrarPlanoEmExecucao(): Promise<void> {
+    const filtro = this.page.getByRole('combobox', { name: /filtro|situação|status/i }).first();
+    if (await filtro.count()) {
+      await filtro.click();
+      await this.page.getByRole('option', { name: /em execução/i }).click();
+    }
+  }
 }

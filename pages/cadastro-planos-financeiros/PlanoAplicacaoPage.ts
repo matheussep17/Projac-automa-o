@@ -1,5 +1,5 @@
 import { expect, Page } from '@playwright/test';
-import { planoAplicacaoData } from '../test-data/plano-aplicacao.data';
+import { planoAplicacaoData } from '../../test-data/plano-aplicacao.data';
 
 export class PlanoAplicacaoPage {
   constructor(private readonly page: Page) {}

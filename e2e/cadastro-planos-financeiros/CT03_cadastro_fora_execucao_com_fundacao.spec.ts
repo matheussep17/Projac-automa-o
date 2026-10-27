@@ -1,0 +1,3 @@
+import { test } from '../../fixtures/test';
+import { cadastrarPlanoFinanceiro } from '../../flows/cadastroPlanoFinanceiro';
+test('CT03 - cadastro fora de execução com fundação @cadastro @fora-execucao @fundacao', async ({ page }) => cadastrarPlanoFinanceiro(page, { emExecucao: false, comFundacao: true }));

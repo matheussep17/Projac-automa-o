@@ -1,5 +1,5 @@
 import { Page } from '@playwright/test';
-import { sharedData } from '../test-data/shared.data';
+import { sharedData } from '../../test-data/shared.data';
 
 export class CoordenacaoAprovacaoPage {
   constructor(private readonly page: Page) {}

@@ -1,5 +1,5 @@
 import { expect, Page } from '@playwright/test';
-import { tratamentoTributarioData } from '../test-data/tratamento-tributario.data';
+import { tratamentoTributarioData } from '../../test-data/tratamento-tributario.data';
 
 export class TratamentoTributarioPage {
   constructor(private readonly page: Page) {}

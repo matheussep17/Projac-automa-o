@@ -1,6 +1,6 @@
 import { Page } from '@playwright/test';
-import { cronogramaData } from '../test-data/cronograma.data';
-import { sharedData } from '../test-data/shared.data';
+import { cronogramaData } from '../../test-data/cronograma.data';
+import { sharedData } from '../../test-data/shared.data';
 
 export class CronogramaPage {
   constructor(private readonly page: Page) {}

@@ -1,6 +1,6 @@
 import { expect, Page } from '@playwright/test';
-import { sharedData } from '../test-data/shared.data';
-import { descricaoData } from '../test-data/descricao';
+import { sharedData } from '../../test-data/shared.data';
+import { descricaoData } from '../../test-data/descricao';
 
 export type ConfiguracaoDescricao = {
   emExecucao: boolean;

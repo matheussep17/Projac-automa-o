@@ -1,5 +1,5 @@
 import { expect, Page } from '@playwright/test';
-import { indicadorMetaData } from '../test-data/indicador-meta.data';
+import { indicadorMetaData } from '../../test-data/indicador-meta.data';
 
 export class IndicadorMetaPage {
   constructor(private readonly page: Page) {}

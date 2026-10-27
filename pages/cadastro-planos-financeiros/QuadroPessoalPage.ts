@@ -1,6 +1,6 @@
 import { expect, Locator, Page } from '@playwright/test';
-import { quadroPessoalData } from '../test-data/quadro-pessoal.data';
-import { sharedData } from '../test-data/shared.data';
+import { quadroPessoalData } from '../../test-data/quadro-pessoal.data';
+import { sharedData } from '../../test-data/shared.data';
 
 export class QuadroPessoalPage {
   constructor(private readonly page: Page) {}

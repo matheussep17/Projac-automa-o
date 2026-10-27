@@ -1,6 +1,6 @@
 import { Page } from '@playwright/test';
-import { desembolsoData } from '../test-data/desembolso.data';
-import { sharedData } from '../test-data/shared.data';
+import { desembolsoData } from '../../test-data/desembolso.data';
+import { sharedData } from '../../test-data/shared.data';
 
 export class DesembolsoPage {
   constructor(private readonly page: Page) {}

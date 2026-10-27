@@ -16,14 +16,15 @@ export default defineConfig({
   testDir: './e2e',
 
   testMatch: [
-    '**/CT01_cadastro_execucao_com_fundacao.spec.ts',
-    '**/CT02_cadastro_execucao_sem_fundacao.spec.ts',
-    '**/CT03_cadastro_fora_execucao_com_fundacao.spec.ts',
-    '**/CT04_cadastro_fora_execucao_sem_fundacao.spec.ts',
-    '**/CT05_validacoes_obrigatorias.spec.ts',
-    '**/CT06_salvamento_rascunho_com_fundacao.spec.ts',
-    '**/CT07_salvamento_rascunho_sem_fundacao.spec.ts',
-    '**/CT08_cadastro_fora_execucao_sem_participante.spec.ts',
+    '**/cadastro-planos-financeiros/CT01_cadastro_execucao_com_fundacao.spec.ts',
+    '**/cadastro-planos-financeiros/CT02_cadastro_execucao_sem_fundacao.spec.ts',
+    '**/cadastro-planos-financeiros/CT03_cadastro_fora_execucao_com_fundacao.spec.ts',
+    '**/cadastro-planos-financeiros/CT04_cadastro_fora_execucao_sem_fundacao.spec.ts',
+    '**/cadastro-planos-financeiros/CT05_validacoes_obrigatorias.spec.ts',
+    '**/cadastro-planos-financeiros/CT06_salvamento_rascunho_com_fundacao.spec.ts',
+    '**/cadastro-planos-financeiros/CT07_salvamento_rascunho_sem_fundacao.spec.ts',
+    '**/cadastro-planos-financeiros/CT08_cadastro_fora_execucao_sem_participante.spec.ts',
+    '**/avaliacao-planos-financeiros/CT01_avaliacao_fora_execucao_com_fundacao.spec.ts',
   ],
 
   fullyParallel: false,

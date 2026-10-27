@@ -1,5 +1,5 @@
 import { Page } from '@playwright/test';
-import { recursosUfgData } from '../test-data/recursos-ufg.data';
+import { recursosUfgData } from '../../test-data/recursos-ufg.data';
 
 export class RecursosUfgPage {
   constructor(private readonly page: Page) {}
