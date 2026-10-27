@@ -113,6 +113,12 @@ export class PlanoTrabalhoPage {
       await botaoFiltros.click();
     }
     const filtro = this.page.getByRole('combobox', { name: /filtro|situação|status/i }).first();
+    if (codigo) {
+      const filtroCodigo = this.page.getByRole('textbox', { name: /c[oó]digo.*plano/i }).first();
+      await expect(filtroCodigo).toBeVisible();
+      await filtroCodigo.fill(codigo);
+      await filtroCodigo.press('Enter');
+    }
     if (await filtro.count()) {
       await filtro.click();
       await this.page.getByRole('option', { name: /em execução/i }).click();
