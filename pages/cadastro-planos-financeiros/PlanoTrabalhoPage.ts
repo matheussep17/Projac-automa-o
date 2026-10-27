@@ -104,10 +104,6 @@ export class PlanoTrabalhoPage {
     } else {
       await linha.getByRole('button', { name: /editar|visualizar/i }).first().click();
     }
-    const editar = this.page.getByRole('button', { name: /editar/i }).first();
-    if (await editar.isVisible().catch(() => false)) {
-      await editar.click();
-    }
     await expect(this.page.getByText('Documento Contratual', { exact: true }).last()).toBeVisible();
   }
 
