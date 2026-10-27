@@ -37,6 +37,12 @@ export class QuadroPessoalPage {
       await expect(nomeParticipante).toHaveValue(/Abadia Dos Reis Nascimento/);
     }
 
+    // O campo é obrigatório em homologação, mas não é exibido em alguns ambientes.
+    const escolaridade = dialog.getByRole('combobox', { name: 'Escolaridade e/ou Experiência' });
+    if (await escolaridade.count()) {
+      await this.selecionarOpcao(escolaridade, /^(Ensino Superior|Superior Completo)$/);
+    }
+
     await dialog.getByLabel('Quantidade de meses').fill(quadroPessoalData.quantidadeMeses);
     const periodo = dialog.getByRole('group', { name: 'Período *' });
     const periodoInicio = periodo.locator('input:visible').first();
