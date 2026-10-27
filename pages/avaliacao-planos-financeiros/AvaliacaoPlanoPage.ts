@@ -34,14 +34,14 @@ export class AvaliacaoPlanoPage {
     await expect(tabela).not.toContainText('CARREGANDO', { timeout: 15_000 });
     let ultima = codigoAlvo
       ? tabela.getByRole('row').filter({ hasText: codigoAlvo }).first()
-      : tabela.getByRole('row').last();
+      : tabela.getByRole('row').filter({ hasText: /PTFPQ-\d+/ }).last();
     const proxima = this.page.getByRole('button', { name: /próxima|next/i });
     while (await proxima.isVisible().catch(() => false) && !(await proxima.isDisabled().catch(() => true))) {
       await proxima.click();
       await expect(tabela).toBeVisible();
       ultima = codigoAlvo
         ? tabela.getByRole('row').filter({ hasText: codigoAlvo }).first()
-        : tabela.getByRole('row').last();
+        : tabela.getByRole('row').filter({ hasText: /PTFPQ-\d+/ }).last();
     }
     const codigo = (await ultima.getByRole('cell').first().textContent())?.trim() ?? '';
     await ultima.getByRole('button', { name: /avaliar/i }).click();

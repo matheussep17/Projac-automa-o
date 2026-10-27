@@ -11,6 +11,7 @@ export class DescricaoPage {
   constructor(private readonly page: Page) {}
 
   async preencher(config: ConfiguracaoDescricao): Promise<void> {
+    await expect(this.page.getByRole('heading', { name: 'Descrição', exact: true })).toBeVisible({ timeout: 15_000 });
     const usuariosAssistentes = this.page.getByRole('combobox', {
       name: 'Usuários assistentes',
     });
