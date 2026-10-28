@@ -55,18 +55,11 @@ export async function avaliarRemanejamento(
     });
   }
 
-  await test.step('Gestor Financeiro aprova e tenta enviar o remanejamento ao SEI', async () => {
+  await test.step('Gestor Financeiro aprova e envia o remanejamento ao SEI', async () => {
     await perfil.trocarPara('Gestor Financeiro');
     await remanejamento.abrirAvaliacao(codigoPlano);
     await remanejamento.aprovarCronograma('Remanejamento do cronograma aprovado pelo Gestor Financeiro.');
-    const processoSei = await remanejamento.enviarParaSei({ ignorarErroEtapaCronograma: true });
-    if (processoSei) {
-      expect(processoSei).toMatch(/^\d{5}\.\d{6}\/\d{4}-\d{2}$/);
-    } else {
-      test.info().annotations.push({
-        type: 'known-issue',
-        description: 'Erro 500 do SEI ignorado: Meta.getEtapaCronograma() nulo. A nova versão é validada no gerenciamento.',
-      });
-    }
+    const processoSei = await remanejamento.enviarParaSei();
+    expect(processoSei).toMatch(/^\d{5}\.\d{6}\/\d{4}-\d{2}$/);
   });
 }

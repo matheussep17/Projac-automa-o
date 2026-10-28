@@ -71,9 +71,7 @@ export class RemanejamentoPage {
     await expect(this.page.getByText('Avaliação do Plano de Trabalho salvo(a) com sucesso!', { exact: true })).toBeVisible();
   }
 
-  async enviarParaSei(
-    opcoes: { ignorarErroEtapaCronograma?: boolean } = {},
-  ): Promise<string | undefined> {
+  async enviarParaSei(): Promise<string> {
     const enviar = this.page.getByRole('button', { name: 'Enviar para o SEI', exact: true });
     // A tela recalcula o aceite das diferenças com debounce antes de habilitar o envio.
     await expect(enviar).toBeEnabled();
@@ -86,12 +84,6 @@ export class RemanejamentoPage {
       this.confirmar(),
     ]);
     const retorno = await resposta.text();
-    if (opcoes.ignorarErroEtapaCronograma && resposta.status() === 500) {
-      // Exceção conhecida autorizada para validar a nova versão mesmo com a integração indisponível.
-      expect(retorno).toContain('Meta.getEtapaCronograma()');
-      expect(retorno).toContain('is null');
-      return undefined;
-    }
     expect(resposta.status(), `Falha ao enviar remanejamento ao SEI: ${retorno}`).toBe(200);
     const mensagem = this.page.getByText(/O Plano de Trabalho Financeiro foi enviado ao processo/i);
     await expect(mensagem).toBeVisible({ timeout: 15_000 });
