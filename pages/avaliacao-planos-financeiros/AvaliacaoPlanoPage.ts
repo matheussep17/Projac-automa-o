@@ -12,7 +12,7 @@ export class AvaliacaoPlanoPage {
     await expect(this.page.getByText(/Pendentes de avalia/i)).toBeVisible();
   }
 
-  async abrirParaEnvio(codigo?: string): Promise<string> {
+  private async abrirAvaliacao(codigo?: string): Promise<string> {
     const tabela = this.page.getByRole('table').first();
     await expect(tabela).not.toContainText('CARREGANDO', { timeout: 15_000 });
     const linhas = tabela.getByRole('row');
@@ -29,50 +29,43 @@ export class AvaliacaoPlanoPage {
     expect(codigoPlano).toMatch(/^PTFPQ-\d+$/);
     await ultima.getByRole('button', { name: /avaliar/i }).click();
     await expect(this.page.getByRole('heading', { name: 'Avaliar Plano de Trabalho Financeiro' })).toBeVisible();
+    return codigoPlano;
+  }
+
+  private async preencherAprovacao(justificativa: string): Promise<void> {
     await this.page.getByRole('radio', { name: 'Aprovado', exact: true }).check();
-    await this.page.getByRole('textbox', { name: 'Justificativa', exact: true }).fill(
-      'Plano aprovado e pronto para criação do processo SEI.',
-    );
+    await this.page.getByRole('textbox', { name: 'Justificativa', exact: true }).fill(justificativa);
+  }
+
+  private async confirmarSalvamento(): Promise<void> {
+    const confirmacao = this.page.getByRole('dialog');
+    await expect(confirmacao).toBeVisible();
+    await confirmacao.getByRole('button', { name: 'Sim', exact: true }).click();
+  }
+
+  async abrirParaEnvio(codigo?: string): Promise<string> {
+    const codigoPlano = await this.abrirAvaliacao(codigo);
+    await this.preencherAprovacao('Plano aprovado e pronto para criação do processo SEI.');
     return codigoPlano;
   }
 
   async avaliarUltimo(justificativa: string, arquivo?: string, codigoAlvo?: string): Promise<string> {
-    const tabela = this.page.getByRole('table').first();
-    await expect(tabela).not.toContainText('CARREGANDO', { timeout: 15_000 });
-    let ultima = codigoAlvo
-      ? tabela.getByRole('row').filter({ hasText: codigoAlvo }).first()
-      : tabela.getByRole('row').filter({ hasText: /PTFPQ-\d+/ }).last();
-    const proxima = this.page.getByRole('button', { name: /próxima|next/i });
-    while (await proxima.isVisible().catch(() => false) && !(await proxima.isDisabled().catch(() => true))) {
-      await proxima.click();
-      await expect(tabela).toBeVisible();
-      ultima = codigoAlvo
-        ? tabela.getByRole('row').filter({ hasText: codigoAlvo }).first()
-        : tabela.getByRole('row').filter({ hasText: /PTFPQ-\d+/ }).last();
-    }
-    const codigo = (await ultima.getByRole('cell').first().textContent())?.trim() ?? '';
-    await ultima.getByRole('button', { name: /avaliar/i }).click();
-    await expect(this.page.getByRole('heading', { name: 'Avaliar Plano de Trabalho Financeiro' })).toBeVisible();
+    const codigo = await this.abrirAvaliacao(codigoAlvo);
     if (arquivo) {
       const chooser = this.page.waitForEvent('filechooser');
       await this.page.getByRole('button', { name: /selecionar|anexar|arquivo/i }).click();
       await (await chooser).setFiles(arquivo);
     }
-    await this.page.getByRole('radio', { name: 'Aprovado', exact: true }).check();
-    await this.page.getByRole('textbox', { name: 'Justificativa', exact: true }).fill(justificativa);
+    await this.preencherAprovacao(justificativa);
     await this.page.getByRole('button', { name: 'Salvar', exact: true }).click();
-    const confirmacao = this.page.getByRole('dialog');
-    await expect(confirmacao).toBeVisible();
-    await confirmacao.getByRole('button', { name: 'Sim', exact: true }).click();
+    await this.confirmarSalvamento();
     await expect(this.page.getByText(/sucesso|avaliado/i).first()).toBeVisible({ timeout: 15_000 });
     return codigo;
   }
 
   async enviarParaSei(): Promise<string> {
     await this.page.getByRole('button', { name: /Salvar e Criar Processo SEI/i }).click();
-    const confirmacao = this.page.getByRole('dialog');
-    await expect(confirmacao).toBeVisible();
-    await confirmacao.getByRole('button', { name: 'Sim', exact: true }).click();
+    await this.confirmarSalvamento();
     await expect(this.page.getByText(/sucesso/i).first()).toBeVisible();
     const mensagem = this.page.getByText(/processo.*foi criado com sucesso/i).first();
     await expect(mensagem).toBeVisible({ timeout: 10_000 });
