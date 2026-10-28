@@ -7,6 +7,7 @@ import { DocumentoContratualPage } from '../pages/cadastro-planos-financeiros/Do
 
 export type AvaliacaoPlanoConfig = {
   comFundacao: boolean;
+  codigoPlano?: string;
 };
 
 export async function avaliarPlanoFinanceiro(
@@ -19,9 +20,13 @@ export async function avaliarPlanoFinanceiro(
 
   await perfil.trocarPara('Gestor Financeiro');
   await avaliacao.abrirPendentes();
-  let codigoPlano: string | undefined;
+  let codigoPlano = config.codigoPlano;
   if (config.comFundacao) {
-    codigoPlano = await avaliacao.avaliarUltimo('Plano conferido e aprovado pelo Gestor Financeiro.');
+    codigoPlano = await avaliacao.avaliarUltimo(
+      'Plano conferido e aprovado pelo Gestor Financeiro.',
+      undefined,
+      codigoPlano,
+    );
     await perfil.trocarPara('Direção Fundação');
     await avaliacao.abrirPendentes();
     await avaliacao.avaliarUltimo(
