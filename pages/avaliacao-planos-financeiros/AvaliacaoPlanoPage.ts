@@ -12,21 +12,28 @@ export class AvaliacaoPlanoPage {
     await expect(this.page.getByText(/Pendentes de avalia/i)).toBeVisible();
   }
 
-  async abrirParaEnvio(codigo: string): Promise<void> {
+  async abrirParaEnvio(codigo?: string): Promise<string> {
     const tabela = this.page.getByRole('table').first();
     await expect(tabela).not.toContainText('CARREGANDO', { timeout: 15_000 });
-    let ultima = tabela.getByRole('row').filter({ hasText: codigo }).first();
+    const linhas = tabela.getByRole('row');
+    const ultima = codigo
+      ? linhas.filter({ hasText: codigo }).first()
+      : linhas.filter({ hasText: /PTFPQ-\d+/ }).last();
     const proxima = this.page.getByRole('button', { name: /próxima|next/i });
-    while (await proxima.isVisible().catch(() => false) && !(await proxima.isDisabled().catch(() => true))) {
+    while ((!codigo || !(await ultima.count())) && await proxima.isVisible().catch(() => false) && !(await proxima.isDisabled().catch(() => true))) {
       await proxima.click();
-      ultima = tabela.getByRole('row').filter({ hasText: codigo }).first();
+      await expect(tabela).not.toContainText('CARREGANDO', { timeout: 15_000 });
     }
+    await expect(ultima).toBeVisible();
+    const codigoPlano = (await ultima.getByRole('cell').first().innerText()).trim();
+    expect(codigoPlano).toMatch(/^PTFPQ-\d+$/);
     await ultima.getByRole('button', { name: /avaliar/i }).click();
     await expect(this.page.getByRole('heading', { name: 'Avaliar Plano de Trabalho Financeiro' })).toBeVisible();
     await this.page.getByRole('radio', { name: 'Aprovado', exact: true }).check();
     await this.page.getByRole('textbox', { name: 'Justificativa', exact: true }).fill(
       'Plano aprovado e pronto para criação do processo SEI.',
     );
+    return codigoPlano;
   }
 
   async avaliarUltimo(justificativa: string, arquivo?: string, codigoAlvo?: string): Promise<string> {

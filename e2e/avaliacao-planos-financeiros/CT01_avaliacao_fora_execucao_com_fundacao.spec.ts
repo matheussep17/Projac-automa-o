@@ -7,6 +7,10 @@ import { DocumentoContratualPage } from '../../pages/cadastro-planos-financeiros
 import { cadastrarPlanoFinanceiro } from '../../flows/cadastroPlanoFinanceiro';
 
 test('CT01 - avalia plano fora de execução com fundação @avaliacao @fora-execucao @fundacao', async ({ page }) => {
+  // O fluxo completo inclui cadastro, três avaliações, integração SEI e edição contratual.
+  // O trace anterior esgotou os 60 s durante o preenchimento do documento contratual.
+  test.setTimeout(120_000);
+
   const pdf = path.resolve('work/anexo-teste.pdf');
   await cadastrarPlanoFinanceiro(page, {
     emExecucao: false,
@@ -31,5 +35,8 @@ test('CT01 - avalia plano fora de execução com fundação @avaliacao @fora-exe
   await new DocumentoContratualPage(page).adicionarAcordoDeParceria(processoSei);
   await plano.conferirESalvar();
   await plano.filtrarPlanoEmExecucao(codigoPlano);
-  await expect(page.getByText(/em execução/i).first()).toBeVisible();
+  const linhaPlano = page.getByRole('row').filter({
+    has: page.getByRole('cell', { name: codigoPlano, exact: true }),
+  });
+  await expect(linhaPlano.getByRole('cell', { name: 'Em execução', exact: true })).toBeVisible();
 });
