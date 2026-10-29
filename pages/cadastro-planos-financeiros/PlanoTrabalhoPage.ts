@@ -64,7 +64,7 @@ export class PlanoTrabalhoPage {
     ).toHaveCount(0);
   }
 
-  async editarPlanoPorCodigo(codigo: string): Promise<void> {
+  async editarPlanoPorCodigo(codigo: string, viaAvaliacao = false): Promise<void> {
     await this.page.goto('/projac/plano-trabalho-financeiro');
     await this.page.getByText(/Gerenciar.*Repercussão|Gerenciar Plano de Trabalho Financeiro/i).first().click();
     await expect(this.page.getByRole('table').first()).toBeVisible();
@@ -73,7 +73,7 @@ export class PlanoTrabalhoPage {
     const filtro = this.page.getByRole('textbox', { name: /código.*plano|c[oó]digo/i }).first();
     await expect(filtro).toBeVisible();
     await filtro.fill(codigo);
-    await filtro.press('Enter');
+    await this.page.getByRole('button', { name: 'Filtrar', exact: true }).click();
     await expect(this.page.getByRole('table').first()).not.toContainText('CARREGANDO', { timeout: 15_000 });
     const tabela = this.page.getByRole('table').first();
     let linha = tabela.getByRole('row').filter({ hasText: codigo }).first();
@@ -85,12 +85,12 @@ export class PlanoTrabalhoPage {
     }
     await expect(linha).toBeVisible({ timeout: 10_000 });
     const realizarEdicao = linha.getByRole('button', { name: /Realizar EdiÃ§Ã£o|Realizar Edição/i });
-    if (await realizarEdicao.isEnabled().catch(() => false)) {
+    if (!viaAvaliacao && await realizarEdicao.isEnabled().catch(() => false)) {
       await realizarEdicao.click({ timeout: 10_000 });
     } else {
       await linha
         .getByRole('button', { name: /Visualizar AvaliaÃ§Ã£o|Visualizar Avaliação/i })
-        .click({ force: true, noWaitAfter: true, timeout: 10_000 });
+        .click({ timeout: 10_000 });
       await expect(this.page.getByRole('button', { name: 'Editar Plano de Trabalho Financeiro', exact: true }))
         .toBeVisible();
       await this.page.getByRole('button', { name: 'Editar Plano de Trabalho Financeiro', exact: true }).click();
