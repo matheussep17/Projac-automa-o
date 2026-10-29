@@ -86,9 +86,14 @@ export class PlanoTrabalhoPage {
     await expect(linha).toBeVisible({ timeout: 10_000 });
     const realizarEdicao = linha.getByRole('button', { name: /Realizar EdiÃ§Ã£o|Realizar Edição/i });
     if (await realizarEdicao.isEnabled().catch(() => false)) {
-      await realizarEdicao.click();
+      await realizarEdicao.click({ timeout: 10_000 });
     } else {
-      await linha.getByRole('button', { name: /editar|visualizar/i }).first().click();
+      await linha
+        .getByRole('button', { name: /Visualizar AvaliaÃ§Ã£o|Visualizar Avaliação/i })
+        .click({ force: true, noWaitAfter: true, timeout: 10_000 });
+      await expect(this.page.getByRole('button', { name: 'Editar Plano de Trabalho Financeiro', exact: true }))
+        .toBeVisible();
+      await this.page.getByRole('button', { name: 'Editar Plano de Trabalho Financeiro', exact: true }).click();
     }
     await expect(this.page.getByText('Documento Contratual', { exact: true }).last()).toBeVisible();
   }
@@ -113,5 +118,16 @@ export class PlanoTrabalhoPage {
           .toContainText(/em .*execu/i);
       }
     }
+  }
+
+  async solicitarAlteracao(justificativa: string): Promise<void> {
+    await this.page.getByRole('button', { name: 'Conferir Dados', exact: true }).click();
+    await expect(this.page.getByRole('heading', { name: /Confer.*ncia de Dados/i })).toBeVisible();
+    await this.page.getByRole('textbox', { name: 'Justificativa das Alterações', exact: true }).fill(justificativa);
+    await this.page.getByRole('button', { name: 'Solicitar Alteração', exact: true }).click();
+    const dialogo = this.page.getByRole('dialog');
+    await expect(dialogo).toBeVisible();
+    await dialogo.getByRole('button', { name: 'Sim', exact: true }).click();
+    await expect(this.page.getByText(/sucesso/i).first()).toBeVisible({ timeout: 15_000 });
   }
 }

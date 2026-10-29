@@ -25,7 +25,7 @@ export default defineConfig({
     '**/cadastro-planos-financeiros/CT07_salvamento_rascunho_sem_fundacao.spec.ts',
     '**/cadastro-planos-financeiros/CT08_cadastro_fora_execucao_sem_participante.spec.ts',
     '**/avaliacao-planos-financeiros/CT01_avaliacao_fora_execucao_com_fundacao.spec.ts',
-    '**/avaliacao-planos-financeiros/CT02_avaliacao_fora_execucao_sem_fundacao.spec.ts',
+    '**/avaliacao-planos-financeiros/CT03_avaliacao_fora_execucao_com_fundacao_pendente.spec.ts',
     '**/avaliacao-remanejamento/CT01_avaliacao_remanejamento_com_fundacao.spec.ts',
     '**/avaliacao-remanejamento/CT02_avaliacao_remanejamento_sem_fundacao.spec.ts',
   ],

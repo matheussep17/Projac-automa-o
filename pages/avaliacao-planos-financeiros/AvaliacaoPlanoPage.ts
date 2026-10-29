@@ -63,6 +63,25 @@ export class AvaliacaoPlanoPage {
     return codigo;
   }
 
+  async avaliarPendente(justificativa: string, codigoAlvo?: string): Promise<string> {
+    const codigo = await this.abrirAvaliacao(codigoAlvo);
+    await this.page.getByRole('radio', { name: /Pendente de ajuste/i }).check();
+    await this.page.getByRole('textbox', { name: 'Justificativa', exact: true }).fill(justificativa);
+    await this.page.getByRole('button', { name: 'Salvar', exact: true }).click();
+    await this.confirmarSalvamento();
+    await expect(this.page.getByText(/sucesso|avaliado/i).first()).toBeVisible({ timeout: 15_000 });
+    return codigo;
+  }
+
+  async aprovar(justificativa: string, codigoAlvo?: string): Promise<string> {
+    const codigo = await this.abrirAvaliacao(codigoAlvo);
+    await this.preencherAprovacao(justificativa);
+    await this.page.getByRole('button', { name: 'Salvar', exact: true }).click();
+    await this.confirmarSalvamento();
+    await expect(this.page.getByText(/sucesso|avaliado/i).first()).toBeVisible({ timeout: 15_000 });
+    return codigo;
+  }
+
   async enviarParaSei(): Promise<string> {
     await this.page.getByRole('button', { name: /Salvar e Criar Processo SEI/i }).click();
     await this.confirmarSalvamento();
