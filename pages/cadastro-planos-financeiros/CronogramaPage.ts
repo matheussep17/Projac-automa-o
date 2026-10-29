@@ -23,7 +23,7 @@ export class CronogramaPage {
     await inicio.fill(inicioOriginal);
     // A mudança do início recalcula o término; preservamos o período cadastrado.
     await termino.fill(terminoOriginal);
-    await dialogo.getByRole('button', { name: 'Adicionar', exact: true }).click();
+    await dialogo.getByRole('button', { name: /Atualizar|Adicionar/i, exact: true }).click({ timeout: 15_000 });
     await expect(dialogo).toBeHidden();
     const alterada = this.page.getByRole('row').filter({
       has: this.page.getByRole('cell', { name: nova, exact: true }),

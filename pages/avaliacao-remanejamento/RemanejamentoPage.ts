@@ -66,7 +66,7 @@ export class RemanejamentoPage {
   }
 
   async salvarAvaliacao(): Promise<void> {
-    await this.page.getByRole('button', { name: 'Salvar', exact: true }).click();
+    await this.page.getByRole('button', { name: /Atualizar|Salvar/i, exact: true }).click();
     await this.confirmar();
     await expect(this.page.getByText('Avaliação do Plano de Trabalho salvo(a) com sucesso!', { exact: true })).toBeVisible();
   }
