@@ -33,8 +33,7 @@ test('CT03 - fluxo pendente fora de execução com fundação @avaliacao @penden
   await avaliacao.avaliarPendente('Ajustar novamente a etapa do cronograma para 1234.', codigoPlano);
 
   await perfil.trocarPara('TAE');
-  // Após a pendência da Fundação, a edição é aberta pela lupa de avaliação.
-  await plano.editarPlanoPorCodigo(codigoPlano, true);
+  await plano.editarPlanoPorCodigo(codigoPlano);
   await new CronogramaPage(page).alterarEtapa('123', '1234');
   await plano.solicitarAlteracao('Etapa alterada para 1234 conforme solicitado pela Fundação.');
 
