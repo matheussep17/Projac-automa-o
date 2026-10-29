@@ -28,6 +28,8 @@ export default defineConfig({
     '**/avaliacao-planos-financeiros/CT03_avaliacao_fora_execucao_com_fundacao_pendente.spec.ts',
     '**/avaliacao-remanejamento/CT01_avaliacao_remanejamento_com_fundacao.spec.ts',
     '**/avaliacao-remanejamento/CT02_avaliacao_remanejamento_sem_fundacao.spec.ts',
+    '**/avaliacao-remanejamento/CT03_reprova_remanejamento_com_fundacao.spec.ts',
+    '**/avaliacao-remanejamento/CT04_reprova_remanejamento_sem_fundacao.spec.ts',
   ],
 
   fullyParallel: false,

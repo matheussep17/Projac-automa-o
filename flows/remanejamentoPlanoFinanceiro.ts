@@ -63,3 +63,36 @@ export async function avaliarRemanejamento(
     expect(processoSei).toMatch(/^\d{5}\.\d{6}\/\d{4}-\d{2}$/);
   });
 }
+
+export async function reprovarRemanejamento(
+  page: Page,
+  codigoPlano: string,
+  config: RemanejamentoConfig,
+): Promise<void> {
+  const perfil = new PerfilPage(page);
+  const remanejamento = new RemanejamentoPage(page);
+  const perfilAvaliador: 'Gestor Financeiro' | 'Direção Fundação' =
+    config.comFundacao ? 'Direção Fundação' : 'Gestor Financeiro';
+
+  await test.step('TAE solicita alteração da etapa 1 para 12', async () => {
+    await perfil.trocarPara('TAE');
+    await remanejamento.solicitar(codigoPlano);
+    await new CronogramaPage(page).alterarEtapa('1', '12');
+    await remanejamento.salvarSolicitacao(
+      'Alteração da etapa do cronograma de 1 para 12 para reprovação.',
+    );
+  });
+
+  await test.step(`Reprovar remanejamento pelo ${perfilAvaliador}`, async () => {
+    await perfil.trocarPara(perfilAvaliador);
+    await remanejamento.abrirAvaliacao(codigoPlano);
+    await remanejamento.reprovarCronograma(
+      'Remanejamento reprovado conforme avaliação do plano financeiro.',
+    );
+    await remanejamento.salvarAvaliacao();
+  });
+
+  await test.step('Retornar para o Gestor Financeiro para consultar o plano', async () => {
+    await perfil.trocarPara('Gestor Financeiro');
+  });
+}

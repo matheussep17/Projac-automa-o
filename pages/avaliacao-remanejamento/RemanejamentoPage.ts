@@ -12,7 +12,7 @@ export class RemanejamentoPage {
     const linha = this.page.getByRole('row').filter({
       has: this.page.getByRole('cell', { name: codigo, exact: true }),
     });
-    await expect(linha).toBeVisible();
+    await expect(linha).toBeVisible({ timeout: 15_000 });
     return linha;
   }
 
@@ -48,7 +48,23 @@ export class RemanejamentoPage {
       await expect(tabela).not.toHaveText(anterior);
       await expect(tabela).not.toContainText('CARREGANDO', { timeout: 15_000 });
     }
-    await expect(linha).toBeVisible();
+    if (!(await linha.count())) {
+      // A solicitação pode levar alguns segundos para entrar na fila do
+      // avaliador após o salvamento feito pelo TAE.
+      await expect.poll(
+        async () => {
+          if (await linha.count()) return true;
+          await this.page.goto('/projac/plano-trabalho-financeiro');
+          await this.page.getByText('Avaliação de Alterações', { exact: true }).first().click();
+          await expect(this.page.getByRole('tab', { name: 'Pendente', exact: true })).toHaveAttribute('aria-selected', 'true');
+          const tabelaAtualizada = this.page.getByRole('tabpanel', { name: 'Pendente', exact: true }).getByRole('table');
+          await expect(tabelaAtualizada).not.toContainText('CARREGANDO', { timeout: 15_000 });
+          return (await tabelaAtualizada.getByRole('row').filter({ has: this.page.getByRole('cell', { name: codigo, exact: true }) }).count()) > 0;
+        },
+        { timeout: 15_000, intervals: [500, 1_000, 2_000] },
+      ).toBe(true);
+    }
+    await expect(linha).toBeVisible({ timeout: 15_000 });
     await linha.getByRole('button', { name: 'Avaliar', exact: true }).click();
     await expect(this.page.getByRole('heading', { name: 'Avaliar Plano de Trabalho', exact: true })).toBeVisible();
   }
@@ -62,6 +78,14 @@ export class RemanejamentoPage {
     await aceitar.check();
     await expect(aceitar).toBeChecked();
     await this.page.getByRole('radio', { name: 'Aprovado', exact: true }).check();
+    await this.page.getByRole('textbox', { name: 'Justificativa', exact: true }).fill(justificativa);
+  }
+
+  async reprovarCronograma(justificativa: string): Promise<void> {
+    await this.page.getByRole('button', { name: /Cronograma Previsto para Execu/ }).click();
+    const diferencas = this.page.getByRole('region', { name: /Cronograma Previsto para Execu/ });
+    await expect(diferencas.getByRole('cell', { name: '12', exact: true })).toBeVisible();
+    await this.page.getByRole('radio', { name: 'Reprovado', exact: true }).check();
     await this.page.getByRole('textbox', { name: 'Justificativa', exact: true }).fill(justificativa);
   }
 

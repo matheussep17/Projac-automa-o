@@ -24,6 +24,20 @@ export class AvaliacaoPlanoPage {
       await proxima.click();
       await expect(tabela).not.toContainText('CARREGANDO', { timeout: 15_000 });
     }
+    if (codigo && !(await ultima.count())) {
+      // A pendência pode aparecer alguns segundos depois da resposta que
+      // devolve o código do plano recém-cadastrado.
+      await expect.poll(
+        async () => {
+          if (await ultima.count()) return true;
+          await this.page.reload();
+          const tabelaAtualizada = this.page.getByRole('table').first();
+          await expect(tabelaAtualizada).not.toContainText('CARREGANDO', { timeout: 15_000 });
+          return (await tabelaAtualizada.getByRole('row').filter({ hasText: codigo }).count()) > 0;
+        },
+        { timeout: 30_000, intervals: [1_000, 2_000, 3_000] },
+      ).toBe(true);
+    }
     await expect(ultima).toBeVisible();
     const codigoPlano = (await ultima.getByRole('cell').first().innerText()).trim();
     expect(codigoPlano).toMatch(/^PTFPQ-\d+$/);

@@ -100,7 +100,10 @@ export class PlanoTrabalhoPage {
 
   async filtrarPlanoEmExecucao(codigo?: string): Promise<void> {
     const botaoFiltros = this.page.getByRole('button', { name: 'Filtros', exact: true });
-    if (await botaoFiltros.isVisible().catch(() => false)) {
+    const filtroCodigo = codigo
+      ? this.page.getByRole('textbox', { name: /c[oó]digo.*plano/i }).first()
+      : undefined;
+    if (filtroCodigo && !(await filtroCodigo.isVisible().catch(() => false))) {
       await botaoFiltros.click();
     }
     const filtro = this.page.getByRole('combobox', { name: /filtro|situação|status/i }).first();
