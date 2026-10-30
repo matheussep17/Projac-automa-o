@@ -5,12 +5,23 @@ import { sharedData } from '../../test-data/shared.data';
 export class CronogramaPage {
   constructor(private readonly page: Page) {}
 
-  async alterarEtapa(atual: string, nova: string): Promise<void> {
+  async alterarEtapa(atual: string | undefined, nova: string): Promise<void> {
     await this.page.getByText('Cronograma', { exact: true }).click();
     await expect(this.page.getByRole('heading', { name: 'Cronograma', exact: true })).toBeVisible();
-    const linha = this.page.getByRole('row').filter({
-      has: this.page.getByRole('cell', { name: atual, exact: true }),
-    });
+    const linha = atual
+      ? this.page
+          .getByRole('row')
+          .filter({
+            has: this.page.getByRole('cell', { name: atual, exact: true }),
+          })
+          .first()
+      : this.page
+          .getByRole('row')
+          .filter({
+            has: this.page.getByRole('button', { name: 'Editar', exact: true }),
+          })
+          .first();
+    await expect(linha).toBeVisible();
     await linha.getByRole('button', { name: 'Editar', exact: true }).click();
     const dialogo = this.page.getByRole('dialog');
     await dialogo.getByRole('spinbutton', { name: 'Etapa', exact: true }).fill(nova);
