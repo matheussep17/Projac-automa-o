@@ -69,16 +69,49 @@ export class RemanejamentoPage {
     await expect(this.page.getByRole('heading', { name: 'Avaliar Plano de Trabalho', exact: true })).toBeVisible();
   }
 
-  async aprovarCronograma(justificativa: string): Promise<void> {
+  async aprovarCronograma(justificativa: string, etapa = '12'): Promise<void> {
     const titulo = 'Cronograma Previsto para Execução Financeira';
     await this.page.getByRole('button', { name: titulo, exact: true }).click();
     const diferencas = this.page.getByRole('region', { name: titulo, exact: true });
-    await expect(diferencas.getByRole('cell', { name: '12', exact: true })).toBeVisible();
+    await expect(diferencas.getByRole('cell', { name: etapa, exact: true })).toBeVisible();
     const aceitar = diferencas.getByRole('checkbox', { name: 'Aceitar diferenças', exact: true });
     await aceitar.check();
     await expect(aceitar).toBeChecked();
     await this.page.getByRole('radio', { name: 'Aprovado', exact: true }).check();
     await this.page.getByRole('textbox', { name: 'Justificativa', exact: true }).fill(justificativa);
+  }
+
+  async abrirParaAjustes(codigo: string): Promise<void> {
+    const linha = await this.abrirPlanoNaLista(codigo);
+    const visualizarSolicitacoes = linha.getByRole('button', {
+      name: 'Visualizar Solicitação(ões) de Remanejamento',
+      exact: true,
+    });
+    await expect(visualizarSolicitacoes).toBeVisible({ timeout: 15_000 });
+    await visualizarSolicitacoes.click();
+    const aba = this.page.getByRole('tab', { name: /^Aguardando ajustes$/i });
+    await expect(aba).toBeVisible({ timeout: 15_000 });
+    await aba.click();
+    await expect(aba).toHaveAttribute('aria-selected', 'true');
+    const solicitacao = this.page.getByRole('tabpanel', { name: /^Aguardando ajustes$/i })
+      .getByRole('row').filter({
+        has: this.page.getByRole('cell', { name: codigo, exact: true }),
+      });
+    await expect(solicitacao).toBeVisible({ timeout: 15_000 });
+    await solicitacao.getByRole('button', { name: /ajust(?:e|ar).*plano.*financeiro/i }).click();
+    await expect(this.page.getByRole('heading', {
+      name: 'Revisar Solicitação de Remanejamento',
+      exact: true,
+    })).toBeVisible();
+  }
+
+  async deixarPendenteDeAjustes(justificativa: string, etapa: string): Promise<void> {
+    await this.page.getByRole('button', { name: /Cronograma Previsto para Execu/ }).click();
+    const diferencas = this.page.getByRole('region', { name: /Cronograma Previsto para Execu/ });
+    await expect(diferencas.getByRole('cell', { name: etapa, exact: true })).toBeVisible();
+    await this.page.getByRole('radio', { name: /Pendente de ajuste/i }).check();
+    await this.page.getByRole('textbox', { name: 'Justificativa', exact: true }).fill(justificativa);
+    await this.salvarAvaliacao();
   }
 
   async reprovarCronograma(justificativa: string): Promise<void> {

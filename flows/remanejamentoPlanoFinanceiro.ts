@@ -7,6 +7,70 @@ import { RemanejamentoPage } from '../pages/avaliacao-remanejamento/Remanejament
 
 export type RemanejamentoConfig = { comFundacao: boolean };
 
+export async function ajustarEAprovarRemanejamento(
+  page: Page,
+  codigoPlano: string,
+  config: RemanejamentoConfig,
+): Promise<void> {
+  const perfil = new PerfilPage(page);
+  const remanejamento = new RemanejamentoPage(page);
+  const cronograma = new CronogramaPage(page);
+
+  await test.step('TAE solicita remanejamento da etapa 1 para 12', async () => {
+    await perfil.trocarPara('TAE');
+    await remanejamento.solicitar(codigoPlano);
+    await cronograma.alterarEtapa('1', '12');
+    await remanejamento.salvarSolicitacao('Alteração da etapa do cronograma de 1 para 12.');
+  });
+
+  const devolverEAjustar = async (
+    avaliador: 'Direção Fundação' | 'Gestor Financeiro',
+    atual: string,
+    nova: string,
+  ): Promise<void> => {
+    await test.step(`${avaliador} devolve a etapa ${atual} para ajustes`, async () => {
+      await perfil.trocarPara(avaliador);
+      await remanejamento.abrirAvaliacao(codigoPlano);
+      await remanejamento.deixarPendenteDeAjustes(`Ajustar a etapa do cronograma para ${nova}.`, atual);
+    });
+    await test.step(`TAE localiza a solicitação aguardando ajustes e altera de ${atual} para ${nova}`, async () => {
+      await perfil.trocarPara('TAE');
+      await remanejamento.abrirParaAjustes(codigoPlano);
+      await cronograma.alterarEtapa(atual, nova);
+      await remanejamento.salvarSolicitacao(`Etapa alterada de ${atual} para ${nova} conforme solicitado pelo perfil ${avaliador}.`);
+    });
+  };
+
+  const aprovarPelaFundacao = async (etapa: string): Promise<void> => {
+    await test.step(`Direção Fundação aprova o reenvio com etapa ${etapa}`, async () => {
+      await perfil.trocarPara('Direção Fundação');
+      await remanejamento.abrirAvaliacao(codigoPlano);
+      await remanejamento.aprovarCronograma(`Ajuste da etapa para ${etapa} aprovado pela Fundação.`, etapa);
+      await remanejamento.salvarAvaliacao();
+    });
+  };
+
+  if (config.comFundacao) {
+    await devolverEAjustar('Direção Fundação', '12', '123');
+    await aprovarPelaFundacao('123');
+  }
+
+  const etapaAtual = config.comFundacao ? '123' : '12';
+  const etapaFinal = config.comFundacao ? '1234' : '123';
+  await devolverEAjustar('Gestor Financeiro', etapaAtual, etapaFinal);
+  if (config.comFundacao) {
+    await aprovarPelaFundacao(etapaFinal);
+  }
+
+  await test.step('Gestor Financeiro aprova o ajuste final e envia ao SEI', async () => {
+    await perfil.trocarPara('Gestor Financeiro');
+    await remanejamento.abrirAvaliacao(codigoPlano);
+    await remanejamento.aprovarCronograma('Ajustes do remanejamento conferidos e aprovados pelo Gestor Financeiro.', etapaFinal);
+    const processoSei = await remanejamento.enviarParaSei();
+    expect(processoSei).toMatch(/^\d{5}\.\d{6}\/\d{4}-\d{2}$/);
+  });
+}
+
 export async function prepararPlanoParaRemanejamento(
   page: Page,
   config: RemanejamentoConfig,
