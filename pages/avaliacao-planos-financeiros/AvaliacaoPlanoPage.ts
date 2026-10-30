@@ -16,27 +16,31 @@ export class AvaliacaoPlanoPage {
     const tabela = this.page.getByRole('table').first();
     await expect(tabela).not.toContainText('CARREGANDO', { timeout: 15_000 });
     const linhas = tabela.getByRole('row');
-    const ultima = codigo
-      ? linhas.filter({ hasText: codigo }).first()
-      : linhas.filter({ hasText: /PTFPQ-\d+/ }).last();
+    const ultima = codigo ? linhas.filter({ hasText: codigo }).first() : linhas.filter({ hasText: /PTFPQ-\d+/ }).last();
     const proxima = this.page.getByRole('button', { name: /próxima|next/i });
-    while ((!codigo || !(await ultima.count())) && await proxima.isVisible().catch(() => false) && !(await proxima.isDisabled().catch(() => true))) {
+    while (
+      (!codigo || !(await ultima.count())) &&
+      (await proxima.isVisible().catch(() => false)) &&
+      !(await proxima.isDisabled().catch(() => true))
+    ) {
       await proxima.click();
       await expect(tabela).not.toContainText('CARREGANDO', { timeout: 15_000 });
     }
     if (codigo && !(await ultima.count())) {
       // A pendência pode aparecer alguns segundos depois da resposta que
       // devolve o código do plano recém-cadastrado.
-      await expect.poll(
-        async () => {
-          if (await ultima.count()) return true;
-          await this.page.reload();
-          const tabelaAtualizada = this.page.getByRole('table').first();
-          await expect(tabelaAtualizada).not.toContainText('CARREGANDO', { timeout: 15_000 });
-          return (await tabelaAtualizada.getByRole('row').filter({ hasText: codigo }).count()) > 0;
-        },
-        { timeout: 30_000, intervals: [1_000, 2_000, 3_000] },
-      ).toBe(true);
+      await expect
+        .poll(
+          async () => {
+            if (await ultima.count()) return true;
+            await this.page.reload();
+            const tabelaAtualizada = this.page.getByRole('table').first();
+            await expect(tabelaAtualizada).not.toContainText('CARREGANDO', { timeout: 15_000 });
+            return (await tabelaAtualizada.getByRole('row').filter({ hasText: codigo }).count()) > 0;
+          },
+          { timeout: 30_000, intervals: [1_000, 2_000, 3_000] },
+        )
+        .toBe(true);
     }
     await expect(ultima).toBeVisible();
     const codigoPlano = (await ultima.getByRole('cell').first().innerText()).trim();
@@ -90,6 +94,16 @@ export class AvaliacaoPlanoPage {
   async aprovar(justificativa: string, codigoAlvo?: string): Promise<string> {
     const codigo = await this.abrirAvaliacao(codigoAlvo);
     await this.preencherAprovacao(justificativa);
+    await this.page.getByRole('button', { name: 'Salvar', exact: true }).click();
+    await this.confirmarSalvamento();
+    await expect(this.page.getByText(/sucesso|avaliado/i).first()).toBeVisible({ timeout: 15_000 });
+    return codigo;
+  }
+
+  async reprovar(justificativa: string, codigoAlvo?: string): Promise<string> {
+    const codigo = await this.abrirAvaliacao(codigoAlvo);
+    await this.page.getByRole('radio', { name: 'Reprovado', exact: true }).check();
+    await this.page.getByRole('textbox', { name: 'Justificativa', exact: true }).fill(justificativa);
     await this.page.getByRole('button', { name: 'Salvar', exact: true }).click();
     await this.confirmarSalvamento();
     await expect(this.page.getByText(/sucesso|avaliado/i).first()).toBeVisible({ timeout: 15_000 });

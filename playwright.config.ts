@@ -4,9 +4,7 @@ const environment = process.env.TEST_ENV ?? 'dev';
 
 const baseURL =
   process.env.TEST_BASE_URL ??
-  (environment === 'homolog'
-    ? 'https://projetosacademicos-homolog.ufg.br'
-    : 'https://projetosacademicos-dev.ufg.br');
+  (environment === 'homolog' ? 'https://projetosacademicos-homolog.ufg.br' : 'https://projetosacademicos-dev.ufg.br');
 
 export default defineConfig({
   timeout: 60_000,
@@ -27,6 +25,10 @@ export default defineConfig({
     '**/avaliacao-planos-financeiros/CT01_avaliacao_fora_execucao_com_fundacao.spec.ts',
     '**/avaliacao-planos-financeiros/CT02_avaliacao_fora_execucao_sem_fundacao.spec.ts',
     '**/avaliacao-planos-financeiros/CT03_avaliacao_fora_execucao_com_fundacao_ajustes.spec.ts',
+    '**/avaliacao-planos-financeiros/CT04_reprova_gestor_com_fundacao.spec.ts',
+    '**/avaliacao-planos-financeiros/CT05_reprova_direcao_com_fundacao.spec.ts',
+    '**/avaliacao-planos-financeiros/CT06_reprova_gestor_avaliacao_final_com_fundacao.spec.ts',
+    '**/avaliacao-planos-financeiros/CT07_reprova_gestor_sem_fundacao.spec.ts',
     '**/avaliacao-remanejamento/CT01_avaliacao_remanejamento_com_fundacao.spec.ts',
     '**/avaliacao-remanejamento/CT02_avaliacao_remanejamento_sem_fundacao.spec.ts',
     '**/avaliacao-remanejamento/CT03_reprova_remanejamento_com_fundacao.spec.ts',
@@ -40,10 +42,7 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   workers: 1,
 
-  reporter: [
-    ['list'],
-    ['html', { open: 'never' }],
-  ],
+  reporter: [['list'], ['html', { open: 'never' }]],
 
   use: {
     ...devices['Desktop Chrome'],
