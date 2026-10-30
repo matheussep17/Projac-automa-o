@@ -69,15 +69,7 @@ export class AvaliacaoPlanoPage {
 
   async avaliarUltimo(justificativa: string, arquivo?: string, codigoAlvo?: string): Promise<string> {
     const codigo = await this.abrirAvaliacao(codigoAlvo);
-    if (arquivo) {
-      const chooser = this.page.waitForEvent('filechooser');
-      await this.page.getByRole('button', { name: /selecionar|anexar|arquivo/i }).click();
-      await (await chooser).setFiles(arquivo);
-    }
-    await this.preencherAprovacao(justificativa);
-    await this.page.getByRole('button', { name: 'Salvar', exact: true }).click();
-    await this.confirmarSalvamento();
-    await expect(this.page.getByText(/sucesso|avaliado/i).first()).toBeVisible({ timeout: 15_000 });
+    await this.aprovarAberto(justificativa, arquivo);
     return codigo;
   }
 
@@ -93,21 +85,38 @@ export class AvaliacaoPlanoPage {
 
   async aprovar(justificativa: string, codigoAlvo?: string): Promise<string> {
     const codigo = await this.abrirAvaliacao(codigoAlvo);
+    await this.aprovarAberto(justificativa);
+    return codigo;
+  }
+
+  async abrirAvaliacaoParaFluxo(codigoAlvo?: string): Promise<string> {
+    return this.abrirAvaliacao(codigoAlvo);
+  }
+
+  async aprovarAberto(justificativa: string, arquivo?: string): Promise<void> {
+    if (arquivo) {
+      const chooser = this.page.waitForEvent('filechooser');
+      await this.page.getByRole('button', { name: /selecionar|anexar|arquivo/i }).click();
+      await (await chooser).setFiles(arquivo);
+    }
     await this.preencherAprovacao(justificativa);
     await this.page.getByRole('button', { name: 'Salvar', exact: true }).click();
     await this.confirmarSalvamento();
     await expect(this.page.getByText(/sucesso|avaliado/i).first()).toBeVisible({ timeout: 15_000 });
-    return codigo;
   }
 
   async reprovar(justificativa: string, codigoAlvo?: string): Promise<string> {
     const codigo = await this.abrirAvaliacao(codigoAlvo);
+    await this.reprovarAberto(justificativa);
+    return codigo;
+  }
+
+  async reprovarAberto(justificativa: string): Promise<void> {
     await this.page.getByRole('radio', { name: 'Reprovado', exact: true }).check();
     await this.page.getByRole('textbox', { name: 'Justificativa', exact: true }).fill(justificativa);
     await this.page.getByRole('button', { name: 'Salvar', exact: true }).click();
     await this.confirmarSalvamento();
     await expect(this.page.getByText(/sucesso|avaliado/i).first()).toBeVisible({ timeout: 15_000 });
-    return codigo;
   }
 
   async abrirParaEdicao(codigoAlvo?: string): Promise<string> {

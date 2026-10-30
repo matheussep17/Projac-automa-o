@@ -37,7 +37,9 @@ export async function ajustarEAprovarRemanejamento(
       await perfil.trocarPara('TAE');
       await remanejamento.abrirParaAjustes(codigoPlano);
       await cronograma.alterarEtapa(atual, nova);
-      await remanejamento.salvarSolicitacao(`Etapa alterada de ${atual} para ${nova} conforme solicitado pelo perfil ${avaliador}.`);
+      await remanejamento.salvarSolicitacao(
+        `Etapa alterada de ${atual} para ${nova} conforme solicitado pelo perfil ${avaliador}.`,
+      );
     });
   };
 
@@ -65,22 +67,23 @@ export async function ajustarEAprovarRemanejamento(
   await test.step('Gestor Financeiro aprova o ajuste final e envia ao SEI', async () => {
     await perfil.trocarPara('Gestor Financeiro');
     await remanejamento.abrirAvaliacao(codigoPlano);
-    await remanejamento.aprovarCronograma('Ajustes do remanejamento conferidos e aprovados pelo Gestor Financeiro.', etapaFinal);
+    await remanejamento.aprovarCronograma(
+      'Ajustes do remanejamento conferidos e aprovados pelo Gestor Financeiro.',
+      etapaFinal,
+    );
     const processoSei = await remanejamento.enviarParaSei();
     expect(processoSei).toMatch(/^\d{5}\.\d{6}\/\d{4}-\d{2}$/);
   });
 }
 
-export async function prepararPlanoParaRemanejamento(
-  page: Page,
-  config: RemanejamentoConfig,
-): Promise<string> {
+export async function prepararPlanoParaRemanejamento(page: Page, config: RemanejamentoConfig): Promise<string> {
   // Captura o plano desta execução, sem selecionar outro registro pela posição na lista.
   const [resposta] = await Promise.all([
-    page.waitForResponse((response) =>
-      response.request().method() === 'POST' &&
-      new URL(response.url()).pathname.endsWith('/repercussao-financeira') &&
-      response.ok(),
+    page.waitForResponse(
+      (response) =>
+        response.request().method() === 'POST' &&
+        new URL(response.url()).pathname.endsWith('/repercussao-financeira') &&
+        response.ok(),
     ),
     cadastrarPlanoFinanceiro(page, { emExecucao: false, comFundacao: config.comFundacao }),
   ]);
@@ -135,28 +138,33 @@ export async function reprovarRemanejamento(
 ): Promise<void> {
   const perfil = new PerfilPage(page);
   const remanejamento = new RemanejamentoPage(page);
-  const perfilAvaliador: 'Gestor Financeiro' | 'Direção Fundação' =
-    config.comFundacao ? 'Direção Fundação' : 'Gestor Financeiro';
+  const perfilAvaliador: 'Gestor Financeiro' | 'Direção Fundação' = config.comFundacao
+    ? 'Direção Fundação'
+    : 'Gestor Financeiro';
 
   await test.step('TAE solicita alteração da etapa 1 para 12', async () => {
     await perfil.trocarPara('TAE');
     await remanejamento.solicitar(codigoPlano);
     await new CronogramaPage(page).alterarEtapa('1', '12');
-    await remanejamento.salvarSolicitacao(
-      'Alteração da etapa do cronograma de 1 para 12 para reprovação.',
-    );
+    await remanejamento.salvarSolicitacao('Alteração da etapa do cronograma de 1 para 12 para reprovação.');
   });
 
   await test.step(`Reprovar remanejamento pelo ${perfilAvaliador}`, async () => {
     await perfil.trocarPara(perfilAvaliador);
     await remanejamento.abrirAvaliacao(codigoPlano);
-    await remanejamento.reprovarCronograma(
-      'Remanejamento reprovado conforme avaliação do plano financeiro.',
-    );
+    await remanejamento.reprovarCronograma('Remanejamento reprovado conforme avaliação do plano financeiro.');
     await remanejamento.salvarAvaliacao();
   });
 
   await test.step('Retornar para o Gestor Financeiro para consultar o plano', async () => {
     await perfil.trocarPara('Gestor Financeiro');
   });
+}
+
+export async function validarRemanejamentoConcluido(page: Page, codigoPlano: string, novaVersao = true): Promise<void> {
+  const linha = await new RemanejamentoPage(page).abrirPlanoNaLista(codigoPlano);
+  await expect(linha.getByRole('cell', { name: 'Em execução', exact: true })).toBeVisible();
+  if (novaVersao) {
+    await expect(linha.getByRole('cell', { name: 'Plano em execução (nova versão)', exact: true })).toBeVisible();
+  }
 }

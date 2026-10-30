@@ -2,7 +2,7 @@ import { test, expect } from '../../fixtures/test';
 import { cadastrarPlanoFinanceiro } from '../../flows/cadastroPlanoFinanceiro';
 import { avaliarPlanoFinanceiro } from '../../flows/avaliacaoPlanoFinanceiro';
 
-test('CT02 - avalia plano fora de execução sem fundação @avaliacao @fora-execucao @sem-fundacao', async ({ page }) => {
+test('CT02 - avalia sem fundacao @avaliacao @sem-fundacao', async ({ page }) => {
   // O cenário inclui cadastro completo, avaliações, integração SEI e edição contratual.
   test.setTimeout(120_000);
 

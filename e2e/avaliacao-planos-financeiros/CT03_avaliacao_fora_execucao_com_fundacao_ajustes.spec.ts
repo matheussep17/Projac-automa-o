@@ -6,7 +6,7 @@ import { CronogramaPage } from '../../pages/cadastro-planos-financeiros/Cronogra
 import { DocumentoContratualPage } from '../../pages/cadastro-planos-financeiros/DocumentoContratualPage';
 import { PlanoTrabalhoPage } from '../../pages/cadastro-planos-financeiros/PlanoTrabalhoPage';
 
-test('CT03 - avalia plano com ajustes pelo gestor e pela fundacao @avaliacao @pendente @fundacao', async ({ page }) => {
+test('CT03 - ajusta com gestor e fundacao @avaliacao @ajuste @fundacao', async ({ page }) => {
   test.setTimeout(300_000);
 
   await cadastrarPlanoFinanceiro(page, { emExecucao: false, comFundacao: true });
