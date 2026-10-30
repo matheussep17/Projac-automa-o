@@ -110,15 +110,79 @@ export class AvaliacaoPlanoPage {
     return codigo;
   }
 
+  async abrirParaEdicao(codigoAlvo?: string): Promise<string> {
+    const codigo = await this.abrirAvaliacao(codigoAlvo);
+    await expect(this.page.locator('.loading-overlay')).toBeHidden({ timeout: 30_000 });
+    const editar = this.page.getByRole('radio', { name: /Editar plano de trabalho financeiro/i });
+    await expect(editar).toBeVisible({ timeout: 15_000 });
+    await editar.check();
+    await this.confirmarSeExibido();
+    return codigo;
+  }
+
+  async salvarJustificativaEEditarPlano(justificativa: string): Promise<void> {
+    const justificativaCampo = this.page.getByRole('textbox', { name: /Justificativa/i }).last();
+    await expect(justificativaCampo).toBeVisible();
+    await justificativaCampo.fill(justificativa);
+    await this.page
+      .getByRole('button', { name: /Salvar.*justificativa.*editar|Salvar justificativa e editar plano/i })
+      .click();
+    await this.confirmarSeExibido();
+    await expect(this.page.getByText('Documento Contratual', { exact: true }).last()).toBeVisible();
+  }
+
+  async aceitarDiferencas(codigo: string): Promise<void> {
+    await this.page.goto('/projac/plano-trabalho-financeiro');
+    await this.page
+      .getByText(/Gerenciar.*Plano de Trabalho Financeiro/i)
+      .first()
+      .click();
+    await expect(this.page.getByRole('table').first()).toBeVisible();
+    await expect(this.page.getByRole('table').first()).not.toContainText('CARREGANDO', { timeout: 15_000 });
+    const filtros = this.page.getByRole('button', { name: 'Filtros', exact: true });
+    const filtroCodigo = this.page.getByRole('textbox', { name: /c[oó]digo.*plano/i }).first();
+    if (!(await filtroCodigo.isVisible().catch(() => false))) {
+      await filtros.click();
+    }
+    await expect(filtroCodigo).toBeVisible();
+    await filtroCodigo.fill(codigo);
+    await filtroCodigo.press('Enter');
+    await expect(this.page.getByRole('table').first()).not.toContainText('CARREGANDO', { timeout: 15_000 });
+
+    const linha = this.page.getByRole('table').first().getByRole('row').filter({ hasText: codigo }).first();
+    await expect(linha).toBeVisible({ timeout: 15_000 });
+    await linha.getByRole('button', { name: /Visualizar Avalia[cç][aã]o/i }).click();
+    await expect(this.page.getByRole('heading', { name: /Avalia.*Plano de Trabalho Financeiro/i })).toBeVisible();
+    const cronograma = this.page.getByRole('button', { name: /Cronograma Previsto para Execu/i });
+    await expect(cronograma).toBeVisible();
+    await cronograma.click();
+
+    const aceitar = this.page.getByRole('checkbox', { name: /Aceitar diferen[cç]as/i });
+    await expect(aceitar).toBeVisible();
+    await aceitar.check();
+    const aceitarAlteracoes = this.page.getByRole('button', { name: /Aceitar altera/i });
+    await expect(aceitarAlteracoes).toBeEnabled();
+    await aceitarAlteracoes.click();
+    await this.confirmarSalvamento();
+    await expect(this.page.getByText(/sucesso|avaliado/i).first()).toBeVisible({ timeout: 15_000 });
+  }
+
   async enviarParaSei(): Promise<string> {
     await this.page.getByRole('button', { name: /Salvar e Criar Processo SEI/i }).click();
     await this.confirmarSalvamento();
     await expect(this.page.getByText(/sucesso/i).first()).toBeVisible();
     const mensagem = this.page.getByText(/processo.*foi criado com sucesso/i).first();
-    await expect(mensagem).toBeVisible({ timeout: 10_000 });
+    await expect(mensagem).toBeVisible({ timeout: 30_000 });
     const texto = (await mensagem.textContent()) ?? '';
     const numero = texto.match(/\d{5}\.\d{6}\/\d{4}-\d{2}/)?.[0];
     expect(numero).toBeDefined();
     return numero!;
+  }
+
+  private async confirmarSeExibido(): Promise<void> {
+    const dialogo = this.page.getByRole('dialog');
+    if (await dialogo.isVisible().catch(() => false)) {
+      await dialogo.getByRole('button', { name: 'Sim', exact: true }).click();
+    }
   }
 }
