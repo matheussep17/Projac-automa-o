@@ -30,6 +30,8 @@ export default defineConfig({
     '**/avaliacao-planos-financeiros/CT06_reprova_gestor_avaliacao_final_com_fundacao.spec.ts',
     '**/avaliacao-planos-financeiros/CT07_reprova_gestor_sem_fundacao.spec.ts',
     '**/avaliacao-planos-financeiros/CT08_ajusta_avaliacao_com_fundacao.spec.ts',
+    '**/avaliacao-planos-financeiros/CT09_aprova_sem_documento_com_fundacao.spec.ts',
+    '**/avaliacao-planos-financeiros/CT10_aprova_sem_documento_sem_fundacao.spec.ts',
     '**/avaliacao-remanejamento/CT01_avaliacao_remanejamento_com_fundacao.spec.ts',
     '**/avaliacao-remanejamento/CT02_avaliacao_remanejamento_sem_fundacao.spec.ts',
     '**/avaliacao-remanejamento/CT03_reprova_remanejamento_com_fundacao.spec.ts',

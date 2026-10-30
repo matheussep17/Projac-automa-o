@@ -153,6 +153,36 @@ export class PlanoTrabalhoPage {
     await expect(linha).toContainText(/reprovad/i);
   }
 
+  async filtrarPlanoAprovado(codigo: string): Promise<void> {
+    await this.page.goto('/projac/plano-trabalho-financeiro');
+    await this.page
+      .getByText(/Gerenciar.*Plano de Trabalho Financeiro/i)
+      .first()
+      .click();
+    await expect(this.page.getByRole('table').first()).toBeVisible();
+    await expect(this.page.getByRole('table').first()).not.toContainText('CARREGANDO', { timeout: 15_000 });
+
+    const filtros = this.page.getByRole('button', { name: 'Filtros', exact: true });
+    const filtroCodigo = this.page.getByRole('textbox', { name: /código.*plano/i }).first();
+    if (!(await filtroCodigo.isVisible().catch(() => false))) {
+      await filtros.click();
+    }
+    await expect(filtroCodigo).toBeVisible();
+    await filtroCodigo.fill(codigo);
+    await filtroCodigo.press('Enter');
+    await expect(this.page.getByRole('table').first()).not.toContainText('CARREGANDO', { timeout: 15_000 });
+
+    const filtroSituacao = this.page.getByRole('combobox', { name: /filtro|situa[cç][aã]o|status/i }).first();
+    await expect(filtroSituacao).toBeVisible();
+    await filtroSituacao.click();
+    await this.page.getByRole('option', { name: /aprovad/i }).click();
+
+    const linha = this.page.getByRole('table').first().getByRole('row').filter({ hasText: codigo }).first();
+    await expect(linha).toBeVisible({ timeout: 15_000 });
+    await expect(linha).toContainText(/aprovad/i);
+    await expect(linha).not.toContainText(/em .*execu/i);
+  }
+
   async solicitarAlteracao(justificativa: string): Promise<void> {
     await this.page.getByRole('button', { name: 'Conferir Dados', exact: true }).click();
     await expect(this.page.getByRole('heading', { name: /Confer.*ncia de Dados/i })).toBeVisible();

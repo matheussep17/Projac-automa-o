@@ -8,6 +8,7 @@ import { DocumentoContratualPage } from '../pages/cadastro-planos-financeiros/Do
 
 export type AvaliacaoPlanoConfig = {
   comFundacao: boolean;
+  comDocumentoContratual?: boolean;
   codigoPlano?: string;
 };
 
@@ -85,9 +86,13 @@ export async function avaliarPlanoFinanceiro(
   codigoPlano = await avaliacao.abrirParaEnvio(codigoPlano);
   const processoSei = await avaliacao.enviarParaSei();
   expect(processoSei).toMatch(/^\d{5}\.\d{6}\/\d{4}-\d{2}$/);
-  await plano.editarPlanoPorCodigo(codigoPlano);
-  await new DocumentoContratualPage(page).adicionarAcordoDeParceria(processoSei);
-  await plano.conferirESalvar();
-  await plano.filtrarPlanoEmExecucao(codigoPlano);
+  if (config.comDocumentoContratual !== false) {
+    await plano.editarPlanoPorCodigo(codigoPlano);
+    await new DocumentoContratualPage(page).adicionarAcordoDeParceria(processoSei);
+    await plano.conferirESalvar();
+    await plano.filtrarPlanoEmExecucao(codigoPlano);
+  } else {
+    await plano.filtrarPlanoAprovado(codigoPlano);
+  }
   return { codigoPlano, processoSei };
 }
