@@ -1,13 +1,9 @@
 import { test as base } from '@playwright/test';
-import { loginAsTae } from '../outputs/auth';
+import { loginAsTae } from './auth';
 
 export const test = base.extend({
   page: async ({ page }, use) => {
-    await page.goto('/projac/', {
-      waitUntil: 'domcontentloaded',
-    });
-
-    await loginAsTae(page);
+    await base.step('Autenticar e selecionar perfil TAE', () => loginAsTae(page));
 
     await use(page);
   },

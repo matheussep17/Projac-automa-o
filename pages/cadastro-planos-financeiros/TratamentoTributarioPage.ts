@@ -1,13 +1,18 @@
 import { expect, Page } from '@playwright/test';
-import { tratamentoTributarioData } from '../../test-data/tratamento-tributario.data';
+import { tratamentoTributarioData } from '../../test-data';
 
 export class TratamentoTributarioPage {
   constructor(private readonly page: Page) {}
 
   async preencher(): Promise<void> {
-    await this.page.getByText('Tratamento tributário', { exact: true }).last().click();
-    await this.page.getByRole('combobox').first().click({ force: true });
-    await this.page.getByRole('option', { name: 'Bolsa', exact: true }).click();
+    const tratamento = this.page.getByRole('combobox', { name: 'Tratamento tributário', exact: true });
+    await expect(tratamento).toBeEnabled();
+    await tratamento.focus();
+    await tratamento.press('Enter');
+    await expect(tratamento).toHaveAttribute('aria-expanded', 'true');
+    await this.page.getByRole('listbox').getByRole('option', { name: 'Bolsa', exact: true }).click();
+    await expect(tratamento).toHaveAttribute('aria-expanded', 'false');
+    await expect(tratamento).toHaveText('Bolsa');
     const modalidade = this.page.getByRole('combobox', {
       name: 'Modalidade de bolsa',
       exact: true,

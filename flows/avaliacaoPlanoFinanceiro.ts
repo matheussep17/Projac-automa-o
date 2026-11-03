@@ -9,7 +9,7 @@ import { DocumentoContratualPage } from '../pages/cadastro-planos-financeiros/Do
 export type AvaliacaoPlanoConfig = {
   comFundacao: boolean;
   comDocumentoContratual?: boolean;
-  codigoPlano?: string;
+  codigoPlano: string;
 };
 
 export type ReprovacaoPlanoConfig = {
@@ -22,14 +22,14 @@ export async function reprovarPlanoFinanceiro(page: Page, config: ReprovacaoPlan
   const avaliacao = new AvaliacaoPlanoPage(page);
   const plano = new PlanoTrabalhoPage(page);
 
-  await cadastrarPlanoFinanceiro(page, {
+  const codigoPlano = await cadastrarPlanoFinanceiro(page, {
     emExecucao: false,
     comFundacao: config.comFundacao,
   });
 
   await perfil.trocarPara('Gestor Financeiro');
   await avaliacao.abrirPendentes();
-  const codigoPlano = await avaliacao.abrirAvaliacaoParaFluxo();
+  await avaliacao.abrirAvaliacaoParaFluxo(codigoPlano);
 
   if (config.reprovarEm === 'gestor') {
     await avaliacao.reprovarAberto('Plano reprovado pelo Gestor Financeiro.');
@@ -67,14 +67,14 @@ export async function avaliarPlanoFinanceiro(
   await avaliacao.abrirPendentes();
   let codigoPlano = config.codigoPlano;
   if (config.comFundacao) {
-    codigoPlano = await avaliacao.avaliarUltimo(
+    codigoPlano = await avaliacao.avaliarPorCodigo(
       'Plano conferido e aprovado pelo Gestor Financeiro.',
       undefined,
       codigoPlano,
     );
     await perfil.trocarPara('Direção Fundação');
     await avaliacao.abrirPendentes();
-    await avaliacao.avaliarUltimo(
+    await avaliacao.avaliarPorCodigo(
       'Documentação conferida e aprovada pela Fundação.',
       path.resolve('work/anexo-teste.pdf'),
       codigoPlano,

@@ -1,6 +1,7 @@
+import { timeouts } from '../../config/timeouts';
 import { expect, Locator, Page } from '@playwright/test';
-import { quadroPessoalData } from '../../test-data/quadro-pessoal.data';
-import { sharedData } from '../../test-data/shared.data';
+import { quadroPessoalData } from '../../test-data';
+import { sharedData } from '../../test-data';
 
 export class QuadroPessoalPage {
   constructor(private readonly page: Page) {}
@@ -27,12 +28,12 @@ export class QuadroPessoalPage {
 
     if (comParticipante) {
       const nomeParticipante = dialog.getByRole('combobox', { name: 'Nome do participante' });
-      await expect(nomeParticipante).toBeEnabled({ timeout: 10_000 });
+      await expect(nomeParticipante).toBeEnabled({ timeout: timeouts.espera });
       await nomeParticipante.fill(quadroPessoalData.bolsista);
       const participante = this.page.getByRole('listbox').getByRole('option', {
         name: new RegExp(`${sharedData.matriculaViceCoordenador}\\s*-\\s*${quadroPessoalData.bolsista}`),
       });
-      await expect(participante).toBeVisible({ timeout: 10_000 });
+      await expect(participante).toBeVisible({ timeout: timeouts.espera });
       await participante.click();
       await expect(nomeParticipante).toHaveValue(/Abadia Dos Reis Nascimento/);
     }
@@ -66,7 +67,7 @@ export class QuadroPessoalPage {
     await expect(dialog.getByLabel('Valor total')).toHaveValue(new RegExp(this.escaparRegex(valorEsperado) + '$'));
 
     await dialog.getByRole('button', { name: 'Adicionar', exact: true }).click();
-    await expect(dialog).toBeHidden({ timeout: 10_000 });
+    await expect(dialog).toBeHidden({ timeout: timeouts.espera });
     await expect(this.linhaBolsista(comParticipante)).toContainText(/20h? mensal/);
 
     await this.page
@@ -81,7 +82,7 @@ export class QuadroPessoalPage {
   }
 
   private async selecionarOpcao(combobox: Locator, nomeOpcao: string | RegExp): Promise<void> {
-    await expect(combobox).toBeEnabled({ timeout: 10_000 });
+    await expect(combobox).toBeEnabled({ timeout: timeouts.espera });
     // O rótulo do Material intercepta cliques no centro do select.
     await combobox.focus();
     await combobox.press('Enter');
@@ -94,7 +95,7 @@ export class QuadroPessoalPage {
         exact: true,
       })
       .first();
-    await expect(opcao).toBeVisible({ timeout: 10_000 });
+    await expect(opcao).toBeVisible({ timeout: timeouts.espera });
     // Não desmarca uma opção já selecionada em um mat-select múltiplo.
     if ((await opcao.getAttribute('aria-selected')) !== 'true') {
       await opcao.click();
@@ -103,7 +104,7 @@ export class QuadroPessoalPage {
       await combobox.press('Escape');
     }
     await expect(combobox).toHaveAttribute('aria-expanded', 'false');
-    await expect(combobox).toContainText(nomeOpcao, { timeout: 10_000 });
+    await expect(combobox).toContainText(nomeOpcao, { timeout: timeouts.espera });
   }
 
   private linhaBolsista(comParticipante = true): Locator {

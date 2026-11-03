@@ -1,5 +1,5 @@
 import { expect, Page } from '@playwright/test';
-import { planoAplicacaoData } from '../../test-data/plano-aplicacao.data';
+import { planoAplicacaoData } from '../../test-data';
 
 export class PlanoAplicacaoPage {
   constructor(private readonly page: Page) {}
@@ -10,7 +10,7 @@ export class PlanoAplicacaoPage {
     if (comFundacao) {
       await dao.fill('');
       await dao.pressSequentially(planoAplicacaoData.valorDao);
-      await expect(dao).toHaveValue(/10,00/);
+      await expect(dao).toHaveValue(this.valorMonetarioEsperado(planoAplicacaoData.valorDao));
     } else {
       await expect(dao).toBeDisabled();
     }
@@ -22,8 +22,9 @@ export class PlanoAplicacaoPage {
     await this.page.getByRole('option', { name: 'Bolsas', exact: true }).click();
     const valor = this.page.getByRole('textbox', { name: 'Valor da Sub-rubrica', exact: true });
     await valor.fill('');
-    await valor.pressSequentially(comFundacao ? planoAplicacaoData.valorComFundacao : planoAplicacaoData.valorSemFundacao);
-    await expect(valor).toHaveValue(comFundacao ? /9\.900,00/ : /10\.000,00/);
+    const valorBolsas = comFundacao ? planoAplicacaoData.valorComFundacao : planoAplicacaoData.valorSemFundacao;
+    await valor.pressSequentially(valorBolsas);
+    await expect(valor).toHaveValue(this.valorMonetarioEsperado(valorBolsas));
     await this.page.getByRole('button', { name: 'Adicionar', exact: true }).last().click();
 
     const cipUfg = this.page.getByRole('textbox', { name: 'Custos indiretos para a UFG' });
@@ -33,5 +34,13 @@ export class PlanoAplicacaoPage {
     await cipUnidade.fill('');
     await cipUnidade.pressSequentially(planoAplicacaoData.zero);
     await this.page.getByRole('button', { name: 'Próxima Etapa' }).click();
+  }
+
+  private valorMonetarioEsperado(centavos: string): RegExp {
+    const valor = (Number(centavos) / 100).toLocaleString('pt-BR', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+    return new RegExp(`(?:^|\\s)${valor.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`);
   }
 }

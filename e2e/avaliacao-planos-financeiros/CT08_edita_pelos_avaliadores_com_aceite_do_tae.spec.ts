@@ -1,3 +1,4 @@
+import { timeouts } from '../../config/timeouts';
 import path from 'node:path';
 import { expect, test } from '../../fixtures/test';
 import { cadastrarPlanoFinanceiro } from '../../flows/cadastroPlanoFinanceiro';
@@ -7,9 +8,9 @@ import { CronogramaPage } from '../../pages/cadastro-planos-financeiros/Cronogra
 import { DocumentoContratualPage } from '../../pages/cadastro-planos-financeiros/DocumentoContratualPage';
 import { PlanoTrabalhoPage } from '../../pages/cadastro-planos-financeiros/PlanoTrabalhoPage';
 
-test('CT08 - ajusta na avaliacao @avaliacao @ajuste @fundacao', async ({ page }) => {
-  test.setTimeout(300_000);
-  await cadastrarPlanoFinanceiro(page, { emExecucao: false, comFundacao: true });
+test('CT08 - avaliadores editam plano e TAE aceita as diferencas com fundacao @avaliacao @ajuste @fundacao', async ({ page }) => {
+  test.setTimeout(timeouts.ajustes);
+  const codigoCriado = await cadastrarPlanoFinanceiro(page, { emExecucao: false, comFundacao: true });
 
   const avaliacao = new AvaliacaoPlanoPage(page);
   const perfil = new PerfilPage(page);
@@ -19,7 +20,7 @@ test('CT08 - ajusta na avaliacao @avaliacao @ajuste @fundacao', async ({ page })
   // O Gestor Financeiro solicita uma edicao no plano.
   await perfil.trocarPara('Gestor Financeiro');
   await avaliacao.abrirPendentes();
-  const codigoPlano = await avaliacao.abrirParaEdicao();
+  const codigoPlano = await avaliacao.abrirParaEdicao(codigoCriado);
   await avaliacao.salvarJustificativaEEditarPlano('Ajustar a etapa do cronograma antes da aprovacao.');
   await cronograma.alterarEtapa(undefined, '123');
   await plano.conferirESalvar();

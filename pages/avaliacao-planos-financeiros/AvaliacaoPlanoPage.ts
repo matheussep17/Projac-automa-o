@@ -1,3 +1,4 @@
+import { timeouts } from '../../config/timeouts';
 import { expect, Page } from '@playwright/test';
 
 export class AvaliacaoPlanoPage {
@@ -13,39 +14,40 @@ export class AvaliacaoPlanoPage {
   }
 
   private async abrirAvaliacao(codigo?: string): Promise<string> {
+    if (!codigo) throw new Error('Informe o codigo retornado pelo cadastro para abrir a avaliacao');
     const tabela = this.page.getByRole('table').first();
-    await expect(tabela).not.toContainText('CARREGANDO', { timeout: 15_000 });
+    await expect(tabela).not.toContainText('CARREGANDO', { timeout: timeouts.espera });
     const linhas = tabela.getByRole('row');
-    const ultima = codigo ? linhas.filter({ hasText: codigo }).first() : linhas.filter({ hasText: /PTFPQ-\d+/ }).last();
+    const linhaPlano = linhas.filter({ has: this.page.getByRole('cell', { name: codigo, exact: true }) });
     const proxima = this.page.getByRole('button', { name: /próxima|next/i });
     while (
-      (!codigo || !(await ultima.count())) &&
+      !(await linhaPlano.count()) &&
       (await proxima.isVisible().catch(() => false)) &&
       !(await proxima.isDisabled().catch(() => true))
     ) {
       await proxima.click();
-      await expect(tabela).not.toContainText('CARREGANDO', { timeout: 15_000 });
+      await expect(tabela).not.toContainText('CARREGANDO', { timeout: timeouts.espera });
     }
-    if (codigo && !(await ultima.count())) {
+    if (codigo && !(await linhaPlano.count())) {
       // A pendência pode aparecer alguns segundos depois da resposta que
       // devolve o código do plano recém-cadastrado.
       await expect
         .poll(
           async () => {
-            if (await ultima.count()) return true;
+            if (await linhaPlano.count()) return true;
             await this.page.reload();
             const tabelaAtualizada = this.page.getByRole('table').first();
-            await expect(tabelaAtualizada).not.toContainText('CARREGANDO', { timeout: 15_000 });
+            await expect(tabelaAtualizada).not.toContainText('CARREGANDO', { timeout: timeouts.espera });
             return (await tabelaAtualizada.getByRole('row').filter({ hasText: codigo }).count()) > 0;
           },
-          { timeout: 30_000, intervals: [1_000, 2_000, 3_000] },
+          { timeout: timeouts.espera, intervals: [1_000, 2_000, 3_000] },
         )
         .toBe(true);
     }
-    await expect(ultima).toBeVisible();
-    const codigoPlano = (await ultima.getByRole('cell').first().innerText()).trim();
+    await expect(linhaPlano).toBeVisible();
+    const codigoPlano = (await linhaPlano.getByRole('cell').first().innerText()).trim();
     expect(codigoPlano).toMatch(/^PTFPQ-\d+$/);
-    await ultima.getByRole('button', { name: /avaliar/i }).click();
+    await linhaPlano.getByRole('button', { name: /avaliar/i }).click();
     await expect(this.page.getByRole('heading', { name: 'Avaliar Plano de Trabalho Financeiro' })).toBeVisible();
     return codigoPlano;
   }
@@ -67,7 +69,7 @@ export class AvaliacaoPlanoPage {
     return codigoPlano;
   }
 
-  async avaliarUltimo(justificativa: string, arquivo?: string, codigoAlvo?: string): Promise<string> {
+  async avaliarPorCodigo(justificativa: string, arquivo?: string, codigoAlvo?: string): Promise<string> {
     const codigo = await this.abrirAvaliacao(codigoAlvo);
     await this.aprovarAberto(justificativa, arquivo);
     return codigo;
@@ -79,7 +81,7 @@ export class AvaliacaoPlanoPage {
     await this.page.getByRole('textbox', { name: 'Justificativa', exact: true }).fill(justificativa);
     await this.page.getByRole('button', { name: 'Salvar', exact: true }).click();
     await this.confirmarSalvamento();
-    await expect(this.page.getByText(/sucesso|avaliado/i).first()).toBeVisible({ timeout: 15_000 });
+    await expect(this.page.getByText(/sucesso|avaliado/i).first()).toBeVisible({ timeout: timeouts.espera });
     return codigo;
   }
 
@@ -102,7 +104,7 @@ export class AvaliacaoPlanoPage {
     await this.preencherAprovacao(justificativa);
     await this.page.getByRole('button', { name: 'Salvar', exact: true }).click();
     await this.confirmarSalvamento();
-    await expect(this.page.getByText(/sucesso|avaliado/i).first()).toBeVisible({ timeout: 15_000 });
+    await expect(this.page.getByText(/sucesso|avaliado/i).first()).toBeVisible({ timeout: timeouts.espera });
   }
 
   async reprovar(justificativa: string, codigoAlvo?: string): Promise<string> {
@@ -116,14 +118,14 @@ export class AvaliacaoPlanoPage {
     await this.page.getByRole('textbox', { name: 'Justificativa', exact: true }).fill(justificativa);
     await this.page.getByRole('button', { name: 'Salvar', exact: true }).click();
     await this.confirmarSalvamento();
-    await expect(this.page.getByText(/sucesso|avaliado/i).first()).toBeVisible({ timeout: 15_000 });
+    await expect(this.page.getByText(/sucesso|avaliado/i).first()).toBeVisible({ timeout: timeouts.espera });
   }
 
   async abrirParaEdicao(codigoAlvo?: string): Promise<string> {
     const codigo = await this.abrirAvaliacao(codigoAlvo);
-    await expect(this.page.locator('.loading-overlay')).toBeHidden({ timeout: 30_000 });
+    await expect(this.page.locator('.loading-overlay')).toBeHidden({ timeout: timeouts.espera });
     const editar = this.page.getByRole('radio', { name: /Editar plano de trabalho financeiro/i });
-    await expect(editar).toBeVisible({ timeout: 15_000 });
+    await expect(editar).toBeVisible({ timeout: timeouts.espera });
     await editar.check();
     await this.confirmarSeExibido();
     return codigo;
@@ -147,7 +149,7 @@ export class AvaliacaoPlanoPage {
       .first()
       .click();
     await expect(this.page.getByRole('table').first()).toBeVisible();
-    await expect(this.page.getByRole('table').first()).not.toContainText('CARREGANDO', { timeout: 15_000 });
+    await expect(this.page.getByRole('table').first()).not.toContainText('CARREGANDO', { timeout: timeouts.espera });
     const filtros = this.page.getByRole('button', { name: 'Filtros', exact: true });
     const filtroCodigo = this.page.getByRole('textbox', { name: /c[oó]digo.*plano/i }).first();
     if (!(await filtroCodigo.isVisible().catch(() => false))) {
@@ -156,10 +158,10 @@ export class AvaliacaoPlanoPage {
     await expect(filtroCodigo).toBeVisible();
     await filtroCodigo.fill(codigo);
     await filtroCodigo.press('Enter');
-    await expect(this.page.getByRole('table').first()).not.toContainText('CARREGANDO', { timeout: 15_000 });
+    await expect(this.page.getByRole('table').first()).not.toContainText('CARREGANDO', { timeout: timeouts.espera });
 
     const linha = this.page.getByRole('table').first().getByRole('row').filter({ hasText: codigo }).first();
-    await expect(linha).toBeVisible({ timeout: 15_000 });
+    await expect(linha).toBeVisible({ timeout: timeouts.espera });
     await linha.getByRole('button', { name: /Visualizar Avalia[cç][aã]o/i }).click();
     await expect(this.page.getByRole('heading', { name: /Avalia.*Plano de Trabalho Financeiro/i })).toBeVisible();
     const cronograma = this.page.getByRole('button', { name: /Cronograma Previsto para Execu/i });
@@ -173,7 +175,7 @@ export class AvaliacaoPlanoPage {
     await expect(aceitarAlteracoes).toBeEnabled();
     await aceitarAlteracoes.click();
     await this.confirmarSalvamento();
-    await expect(this.page.getByText(/sucesso|avaliado/i).first()).toBeVisible({ timeout: 15_000 });
+    await expect(this.page.getByText(/sucesso|avaliado/i).first()).toBeVisible({ timeout: timeouts.espera });
   }
 
   async enviarParaSei(): Promise<string> {
@@ -181,7 +183,7 @@ export class AvaliacaoPlanoPage {
     await this.confirmarSalvamento();
     await expect(this.page.getByText(/sucesso/i).first()).toBeVisible();
     const mensagem = this.page.getByText(/processo.*foi criado com sucesso/i).first();
-    await expect(mensagem).toBeVisible({ timeout: 30_000 });
+    await expect(mensagem).toBeVisible({ timeout: timeouts.espera });
     const texto = (await mensagem.textContent()) ?? '';
     const numero = texto.match(/\d{5}\.\d{6}\/\d{4}-\d{2}/)?.[0];
     expect(numero).toBeDefined();

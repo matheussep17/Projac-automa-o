@@ -1,3 +1,4 @@
+import { timeouts } from '../../config/timeouts';
 import { expect, Page } from '@playwright/test';
 
 export class PlanoTrabalhoPage {
@@ -65,13 +66,13 @@ export class PlanoTrabalhoPage {
       .first()
       .click();
     await expect(this.page.getByRole('table').first()).toBeVisible();
-    await expect(this.page.getByRole('table').first()).not.toContainText('CARREGANDO', { timeout: 15_000 });
+    await expect(this.page.getByRole('table').first()).not.toContainText('CARREGANDO', { timeout: timeouts.espera });
     await this.page.getByRole('button', { name: 'Filtros', exact: true }).click();
     const filtro = this.page.getByRole('textbox', { name: /código.*plano|c[oó]digo/i }).first();
     await expect(filtro).toBeVisible();
     await filtro.fill(codigo);
     await filtro.press('Enter');
-    await expect(this.page.getByRole('table').first()).not.toContainText('CARREGANDO', { timeout: 15_000 });
+    await expect(this.page.getByRole('table').first()).not.toContainText('CARREGANDO', { timeout: timeouts.espera });
     const tabela = this.page.getByRole('table').first();
     let linha = tabela.getByRole('row').filter({ hasText: codigo }).first();
     const proxima = this.page.getByRole('button', { name: /Próxima Página|próxima|next/i });
@@ -81,17 +82,17 @@ export class PlanoTrabalhoPage {
       !(await proxima.isDisabled().catch(() => true))
     ) {
       await proxima.click();
-      await expect(tabela).not.toContainText('CARREGANDO', { timeout: 15_000 });
+      await expect(tabela).not.toContainText('CARREGANDO', { timeout: timeouts.espera });
       linha = tabela.getByRole('row').filter({ hasText: codigo }).first();
     }
-    await expect(linha).toBeVisible({ timeout: 10_000 });
+    await expect(linha).toBeVisible({ timeout: timeouts.espera });
     const realizarEdicao = linha.getByRole('button', { name: /Realizar EdiÃ§Ã£o|Realizar Edição/i });
     if (await realizarEdicao.isEnabled().catch(() => false)) {
-      await realizarEdicao.click({ timeout: 10_000 });
+      await realizarEdicao.click({ timeout: timeouts.espera });
     } else {
       await linha
         .getByRole('button', { name: /Visualizar AvaliaÃ§Ã£o|Visualizar Avaliação/i })
-        .click({ force: true, noWaitAfter: true, timeout: 10_000 });
+        .click({ force: true, noWaitAfter: true, timeout: timeouts.espera });
       await expect(
         this.page.getByRole('button', { name: 'Editar Plano de Trabalho Financeiro', exact: true }),
       ).toBeVisible();
@@ -131,7 +132,7 @@ export class PlanoTrabalhoPage {
       .first()
       .click();
     await expect(this.page.getByRole('table').first()).toBeVisible();
-    await expect(this.page.getByRole('table').first()).not.toContainText('CARREGANDO', { timeout: 15_000 });
+    await expect(this.page.getByRole('table').first()).not.toContainText('CARREGANDO', { timeout: timeouts.espera });
 
     const filtros = this.page.getByRole('button', { name: 'Filtros', exact: true });
     const filtroCodigo = this.page.getByRole('textbox', { name: /c[oó]digo.*plano/i }).first();
@@ -141,7 +142,7 @@ export class PlanoTrabalhoPage {
     await expect(filtroCodigo).toBeVisible();
     await filtroCodigo.fill(codigo);
     await filtroCodigo.press('Enter');
-    await expect(this.page.getByRole('table').first()).not.toContainText('CARREGANDO', { timeout: 15_000 });
+    await expect(this.page.getByRole('table').first()).not.toContainText('CARREGANDO', { timeout: timeouts.espera });
 
     const filtroSituacao = this.page.getByRole('combobox', { name: /filtro|situa[cç][aã]o|status/i }).first();
     await expect(filtroSituacao).toBeVisible();
@@ -149,7 +150,7 @@ export class PlanoTrabalhoPage {
     await this.page.getByRole('option', { name: /reprovad/i }).click();
 
     const linha = this.page.getByRole('table').first().getByRole('row').filter({ hasText: codigo }).first();
-    await expect(linha).toBeVisible({ timeout: 15_000 });
+    await expect(linha).toBeVisible({ timeout: timeouts.espera });
     await expect(linha).toContainText(/reprovad/i);
   }
 
@@ -160,7 +161,7 @@ export class PlanoTrabalhoPage {
       .first()
       .click();
     await expect(this.page.getByRole('table').first()).toBeVisible();
-    await expect(this.page.getByRole('table').first()).not.toContainText('CARREGANDO', { timeout: 15_000 });
+    await expect(this.page.getByRole('table').first()).not.toContainText('CARREGANDO', { timeout: timeouts.espera });
 
     const filtros = this.page.getByRole('button', { name: 'Filtros', exact: true });
     const filtroCodigo = this.page.getByRole('textbox', { name: /código.*plano/i }).first();
@@ -170,7 +171,7 @@ export class PlanoTrabalhoPage {
     await expect(filtroCodigo).toBeVisible();
     await filtroCodigo.fill(codigo);
     await filtroCodigo.press('Enter');
-    await expect(this.page.getByRole('table').first()).not.toContainText('CARREGANDO', { timeout: 15_000 });
+    await expect(this.page.getByRole('table').first()).not.toContainText('CARREGANDO', { timeout: timeouts.espera });
 
     const filtroSituacao = this.page.getByRole('combobox', { name: /filtro|situa[cç][aã]o|status/i }).first();
     await expect(filtroSituacao).toBeVisible();
@@ -178,7 +179,7 @@ export class PlanoTrabalhoPage {
     await this.page.getByRole('option', { name: /aprovad/i }).click();
 
     const linha = this.page.getByRole('table').first().getByRole('row').filter({ hasText: codigo }).first();
-    await expect(linha).toBeVisible({ timeout: 15_000 });
+    await expect(linha).toBeVisible({ timeout: timeouts.espera });
     await expect(linha).toContainText(/aprovad/i);
     await expect(linha).not.toContainText(/em .*execu/i);
   }
@@ -191,6 +192,6 @@ export class PlanoTrabalhoPage {
     const dialogo = this.page.getByRole('dialog');
     await expect(dialogo).toBeVisible();
     await dialogo.getByRole('button', { name: 'Sim', exact: true }).click();
-    await expect(this.page.getByText(/sucesso/i).first()).toBeVisible({ timeout: 15_000 });
+    await expect(this.page.getByText(/sucesso/i).first()).toBeVisible({ timeout: timeouts.espera });
   }
 }

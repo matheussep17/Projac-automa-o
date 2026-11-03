@@ -1,3 +1,5 @@
+import { orcamentoData } from './orcamento.data';
+
 export const quadroPessoalData = {
   bolsista: 'Abadia Dos Reis Nascimento',
   quantidadeMeses: '1',
@@ -6,6 +8,6 @@ export const quadroPessoalData = {
   cargaHorariaMensal: '20',
   justificativaBolsas: 'Valor definido conforme a disponibilidade da sub-rubrica de Bolsas.',
   criteriosSelecao: 'Seleção realizada conforme os critérios acadêmicos e institucionais do projeto.',
-  valorComFundacao: '990000',
-  valorSemFundacao: '1000000',
+  valorComFundacao: orcamentoData.comFundacao.bolsas,
+  valorSemFundacao: orcamentoData.semFundacao.bolsas,
 };

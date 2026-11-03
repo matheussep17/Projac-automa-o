@@ -1,3 +1,4 @@
+import { timeouts } from '../../config/timeouts';
 import { test } from '../../fixtures/test';
 import {
   avaliarRemanejamento,
@@ -6,7 +7,7 @@ import {
 } from '../../flows/remanejamentoPlanoFinanceiro';
 
 test('CT02 - avalia sem fundacao @remanejamento @avaliacao @sem-fundacao', async ({ page }) => {
-  test.setTimeout(180_000);
+  test.setTimeout(timeouts.remanejamento);
   const config = { comFundacao: false };
   const codigoPlano = await prepararPlanoParaRemanejamento(page, config);
   await avaliarRemanejamento(page, codigoPlano, config);

@@ -1,3 +1,5 @@
+import { timeouts } from '../../config/timeouts';
+import { ambienteData } from '../../test-data/ambientes';
 import { expect, Page } from '@playwright/test';
 
 export class ProjetoPage {
@@ -6,22 +8,24 @@ export class ProjetoPage {
   async selecionarNaturezaEProjeto(): Promise<void> {
     await this.page.getByRole('tab', { name: 'Dados do Projeto' }).click();
     const natureza = this.page.getByRole('combobox', { name: 'Natureza' });
-    const pesquisa = this.page.getByRole('option', { name: 'Pesquisa', exact: true });
+    const pesquisa = this.page.getByRole('option', { name: ambienteData.natureza, exact: true });
     let naturezaAberta = false;
     for (let tentativa = 0; tentativa < 3 && !naturezaAberta; tentativa += 1) {
       await natureza.click();
       await natureza.press('ArrowDown');
       naturezaAberta = await pesquisa.isVisible().catch(() => false);
     }
-    await expect(pesquisa).toBeVisible({ timeout: 10_000 });
+    await expect(pesquisa).toBeVisible({ timeout: timeouts.espera });
     await pesquisa.click();
     const projeto = this.page.getByRole('combobox', { name: 'Projeto' });
     await projeto.click();
-    // O projeto é definido pelo primeiro resultado retornado pelo ambiente de teste.
-    const primeiraOpcaoProjeto = this.page.getByRole('option').first();
-    await expect(primeiraOpcaoProjeto).toBeVisible();
-    await primeiraOpcaoProjeto.click();
-    await expect(projeto).toHaveValue(/.+/);
+    await projeto.fill(ambienteData.projeto);
+    const nomeProjeto = ambienteData.projeto.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const nomeComCodigoOpcional = new RegExp(`^(?:[A-Z]+\\d+-\\d{4}\\s*-\\s*)?${nomeProjeto}$`);
+    const opcao = this.page.getByRole('option', { name: nomeComCodigoOpcional });
+    await expect(opcao).toBeVisible({ timeout: timeouts.espera });
+    await opcao.click();
+    await expect(projeto).toHaveValue(nomeComCodigoOpcional);
   }
 
   async anexarExtrato(arquivo: string): Promise<void> {

@@ -1,6 +1,8 @@
+import { timeouts } from '../../config/timeouts';
+import { ambienteData } from '../../test-data/ambientes';
 import { expect, Page } from '@playwright/test';
-import { sharedData } from '../../test-data/shared.data';
-import { descricaoData } from '../../test-data/descricao';
+import { sharedData } from '../../test-data';
+import { descricaoData } from '../../test-data';
 
 export type ConfiguracaoDescricao = {
   emExecucao: boolean;
@@ -11,7 +13,7 @@ export class DescricaoPage {
   constructor(private readonly page: Page) {}
 
   async preencher(config: ConfiguracaoDescricao): Promise<void> {
-    await expect(this.page.getByRole('heading', { name: 'Descrição', exact: true })).toBeVisible({ timeout: 15_000 });
+    await expect(this.page.getByRole('heading', { name: 'Descrição', exact: true })).toBeVisible({ timeout: timeouts.espera });
     const usuariosAssistentes = this.page.getByRole('combobox', {
       name: 'Usuários assistentes',
     });
@@ -21,7 +23,7 @@ export class DescricaoPage {
     const isabelaTerceirizada = this.page.getByRole('option', {
       name: /Isabela De Souza Neiva\s*\(65357\s*-\s*Servi(?:ço|co)\s+Terceirizado\)/i,
     });
-    await expect(isabelaTerceirizada).toBeVisible({ timeout: 15_000 });
+    await expect(isabelaTerceirizada).toBeVisible({ timeout: timeouts.espera });
     await isabelaTerceirizada.click();
     await expect(
       this.page.getByText(descricaoData.usuarioAssistenteNome, {
@@ -58,7 +60,13 @@ export class DescricaoPage {
     const valor = this.page.getByLabel('Valor disponibilizado para o Plano de Trabalho');
     await valor.fill('');
     await valor.pressSequentially(sharedData.valorPlano);
-    await expect(valor).toHaveValue(/10\.000,00/);
+    const valorEsperado = (Number(sharedData.valorPlano) / 100).toLocaleString('pt-BR', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+    await expect(valor).toHaveValue(
+      new RegExp(`(?:^|\\s)${valorEsperado.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`),
+    );
     await this.page.getByRole('radio', { name: 'Público', exact: true }).check();
 
     await this.page.getByLabel('Tipo do instrumento do recurso financeiro').click({ force: true });
@@ -73,7 +81,7 @@ export class DescricaoPage {
     if (config.comFundacao) {
       await this.page.getByLabel('Fundação', { exact: true }).click({ force: true });
       await this.page.getByRole('combobox', { name: 'Fundação', exact: true }).press('Enter');
-      await this.page.getByRole('option', { name: 'Fundação de Apoio à Pesquisa', exact: true }).click();
+      await this.page.getByRole('option', { name: ambienteData.fundacao, exact: true }).click();
     } else {
       await expect(this.page.getByLabel('Fundação', { exact: true })).toBeHidden();
     }

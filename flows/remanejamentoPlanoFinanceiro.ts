@@ -77,19 +77,7 @@ export async function ajustarEAprovarRemanejamento(
 }
 
 export async function prepararPlanoParaRemanejamento(page: Page, config: RemanejamentoConfig): Promise<string> {
-  // Captura o plano desta execução, sem selecionar outro registro pela posição na lista.
-  const [resposta] = await Promise.all([
-    page.waitForResponse(
-      (response) =>
-        response.request().method() === 'POST' &&
-        new URL(response.url()).pathname.endsWith('/repercussao-financeira') &&
-        response.ok(),
-    ),
-    cadastrarPlanoFinanceiro(page, { emExecucao: false, comFundacao: config.comFundacao }),
-  ]);
-  const registro: { data: { codigo: string } } = await resposta.json();
-  const codigoPlano = registro.data.codigo;
-  expect(codigoPlano).toMatch(/^PTFPQ-\d+$/);
+  const codigoPlano = await cadastrarPlanoFinanceiro(page, { emExecucao: false, comFundacao: config.comFundacao });
   await avaliarPlanoFinanceiro(page, { comFundacao: config.comFundacao, codigoPlano });
   const linha = page.getByRole('row').filter({
     has: page.getByRole('cell', { name: codigoPlano, exact: true }),

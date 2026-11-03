@@ -1,16 +1,17 @@
+import { timeouts } from '../../config/timeouts';
 import { test, expect } from '../../fixtures/test';
 import { cadastrarPlanoFinanceiro } from '../../flows/cadastroPlanoFinanceiro';
 import { avaliarPlanoFinanceiro } from '../../flows/avaliacaoPlanoFinanceiro';
 
-test('CT01 - avalia com fundacao @avaliacao @fundacao', async ({ page }) => {
+test('CT02 - aprova plano sem fundacao @avaliacao @sem-fundacao', async ({ page }) => {
   // O cenário inclui cadastro completo, avaliações, integração SEI e edição contratual.
-  test.setTimeout(120_000);
+  test.setTimeout(timeouts.avaliacao);
 
-  await cadastrarPlanoFinanceiro(page, {
+  const codigoCriado = await cadastrarPlanoFinanceiro(page, {
     emExecucao: false,
-    comFundacao: true,
+    comFundacao: false,
   });
-  const { codigoPlano } = await avaliarPlanoFinanceiro(page, { comFundacao: true });
+  const { codigoPlano } = await avaliarPlanoFinanceiro(page, { codigoPlano: codigoCriado, comFundacao: false });
 
   const linhaPlano = page.getByRole('row').filter({
     has: page.getByRole('cell', { name: codigoPlano, exact: true }),

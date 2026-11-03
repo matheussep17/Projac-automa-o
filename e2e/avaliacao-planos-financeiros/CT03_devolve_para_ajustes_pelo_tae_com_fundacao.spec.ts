@@ -1,3 +1,4 @@
+import { timeouts } from '../../config/timeouts';
 import { expect, test } from '../../fixtures/test';
 import { cadastrarPlanoFinanceiro } from '../../flows/cadastroPlanoFinanceiro';
 import { AvaliacaoPlanoPage } from '../../pages/avaliacao-planos-financeiros/AvaliacaoPlanoPage';
@@ -6,10 +7,10 @@ import { CronogramaPage } from '../../pages/cadastro-planos-financeiros/Cronogra
 import { DocumentoContratualPage } from '../../pages/cadastro-planos-financeiros/DocumentoContratualPage';
 import { PlanoTrabalhoPage } from '../../pages/cadastro-planos-financeiros/PlanoTrabalhoPage';
 
-test('CT03 - ajusta com gestor e fundacao @avaliacao @ajuste @fundacao', async ({ page }) => {
-  test.setTimeout(300_000);
+test('CT03 - devolve plano para ajustes pelo TAE com fundacao @avaliacao @ajuste @fundacao', async ({ page }) => {
+  test.setTimeout(timeouts.ajustes);
 
-  await cadastrarPlanoFinanceiro(page, { emExecucao: false, comFundacao: true });
+  const codigoCriado = await cadastrarPlanoFinanceiro(page, { emExecucao: false, comFundacao: true });
 
   const avaliacao = new AvaliacaoPlanoPage(page);
   const perfil = new PerfilPage(page);
@@ -21,6 +22,7 @@ test('CT03 - ajusta com gestor e fundacao @avaliacao @ajuste @fundacao', async (
   await avaliacao.abrirPendentes();
   const codigoPlano = await avaliacao.avaliarPendente(
     'Ajustar a etapa do cronograma antes da aprovacao pelo Gestor Financeiro.',
+    codigoCriado,
   );
 
   // O TAE edita o plano e o envia novamente para avaliacao.

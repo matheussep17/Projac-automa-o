@@ -1,6 +1,6 @@
 import { Page } from '@playwright/test';
-import { sharedData } from '../../test-data/shared.data';
-import { documentoContratualData } from '../../test-data/documento-contratual.data';
+import { sharedData } from '../../test-data';
+import { documentoContratualData } from '../../test-data';
 
 export class DocumentoContratualPage {
   constructor(private readonly page: Page) {}

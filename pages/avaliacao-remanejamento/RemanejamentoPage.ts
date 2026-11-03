@@ -1,3 +1,4 @@
+import { timeouts } from '../../config/timeouts';
 import { expect, Locator, Page } from '@playwright/test';
 
 export class RemanejamentoPage {
@@ -12,7 +13,7 @@ export class RemanejamentoPage {
     const linha = this.page.getByRole('row').filter({
       has: this.page.getByRole('cell', { name: codigo, exact: true }),
     });
-    await expect(linha).toBeVisible({ timeout: 15_000 });
+    await expect(linha).toBeVisible({ timeout: timeouts.espera });
     return linha;
   }
 
@@ -41,12 +42,12 @@ export class RemanejamentoPage {
       has: this.page.getByRole('cell', { name: codigo, exact: true }),
     });
     const proxima = this.page.getByRole('button', { name: 'Próxima Página', exact: true });
-    await expect(tabela).not.toContainText('CARREGANDO', { timeout: 15_000 });
+    await expect(tabela).not.toContainText('CARREGANDO', { timeout: timeouts.espera });
     while (!(await linha.count()) && await proxima.isEnabled()) {
       const anterior = await tabela.innerText();
       await proxima.click();
       await expect(tabela).not.toHaveText(anterior);
-      await expect(tabela).not.toContainText('CARREGANDO', { timeout: 15_000 });
+      await expect(tabela).not.toContainText('CARREGANDO', { timeout: timeouts.espera });
     }
     if (!(await linha.count())) {
       // A solicitação pode levar alguns segundos para entrar na fila do
@@ -58,13 +59,13 @@ export class RemanejamentoPage {
           await this.page.getByText('Avaliação de Alterações', { exact: true }).first().click();
           await expect(this.page.getByRole('tab', { name: 'Pendente', exact: true })).toHaveAttribute('aria-selected', 'true');
           const tabelaAtualizada = this.page.getByRole('tabpanel', { name: 'Pendente', exact: true }).getByRole('table');
-          await expect(tabelaAtualizada).not.toContainText('CARREGANDO', { timeout: 15_000 });
+          await expect(tabelaAtualizada).not.toContainText('CARREGANDO', { timeout: timeouts.espera });
           return (await tabelaAtualizada.getByRole('row').filter({ has: this.page.getByRole('cell', { name: codigo, exact: true }) }).count()) > 0;
         },
-        { timeout: 15_000, intervals: [500, 1_000, 2_000] },
+        { timeout: timeouts.espera, intervals: [500, 1_000, 2_000] },
       ).toBe(true);
     }
-    await expect(linha).toBeVisible({ timeout: 15_000 });
+    await expect(linha).toBeVisible({ timeout: timeouts.espera });
     await linha.getByRole('button', { name: 'Avaliar', exact: true }).click();
     await expect(this.page.getByRole('heading', { name: 'Avaliar Plano de Trabalho', exact: true })).toBeVisible();
   }
@@ -87,17 +88,17 @@ export class RemanejamentoPage {
       name: 'Visualizar Solicitação(ões) de Remanejamento',
       exact: true,
     });
-    await expect(visualizarSolicitacoes).toBeVisible({ timeout: 15_000 });
+    await expect(visualizarSolicitacoes).toBeVisible({ timeout: timeouts.espera });
     await visualizarSolicitacoes.click();
     const aba = this.page.getByRole('tab', { name: /^Aguardando ajustes$/i });
-    await expect(aba).toBeVisible({ timeout: 15_000 });
+    await expect(aba).toBeVisible({ timeout: timeouts.espera });
     await aba.click();
     await expect(aba).toHaveAttribute('aria-selected', 'true');
     const solicitacao = this.page.getByRole('tabpanel', { name: /^Aguardando ajustes$/i })
       .getByRole('row').filter({
         has: this.page.getByRole('cell', { name: codigo, exact: true }),
       });
-    await expect(solicitacao).toBeVisible({ timeout: 15_000 });
+    await expect(solicitacao).toBeVisible({ timeout: timeouts.espera });
     await solicitacao.getByRole('button', { name: /ajust(?:e|ar).*plano.*financeiro/i }).click();
     await expect(this.page.getByRole('heading', {
       name: 'Revisar Solicitação de Remanejamento',
@@ -143,7 +144,7 @@ export class RemanejamentoPage {
     const retorno = await resposta.text();
     expect(resposta.status(), `Falha ao enviar remanejamento ao SEI: ${retorno}`).toBe(200);
     const mensagem = this.page.getByText(/O Plano de Trabalho Financeiro foi enviado ao processo/i);
-    await expect(mensagem).toBeVisible({ timeout: 15_000 });
+    await expect(mensagem).toBeVisible({ timeout: timeouts.espera });
     const processo = (await mensagem.innerText()).match(/\d{5}\.\d{6}\/\d{4}-\d{2}/)?.[0];
     expect(processo).toBeDefined();
     return processo!;

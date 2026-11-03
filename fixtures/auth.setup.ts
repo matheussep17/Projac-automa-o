@@ -1,23 +1,28 @@
-import { chromium, FullConfig } from '@playwright/test';
+import { storageState } from '../config/ambiente';
+import { timeouts } from '../config/timeouts';
+import { chromium } from '@playwright/test';
 import path from 'node:path';
-import { loginAsTae } from '../outputs/auth';
+import { mkdir, writeFile } from 'node:fs/promises';
+import { loginAsTae } from './auth';
 
-export default async function globalSetup(
-  config: FullConfig,
-): Promise<void> {
-  const environment = process.env.TEST_ENV ?? 'dev';
-
+export default async function globalSetup(): Promise<void> {
   const browser = await chromium.launch();
-  const context = await browser.newContext();
-  const page = await context.newPage();
-
-  await loginAsTae(page);
-
-  await context.storageState({
-    path: path.resolve(
-      `playwright/.auth/${environment}.json`,
-    ),
-  });
-
-  await browser.close();
+  try {
+    const context = await browser.newContext();
+    // O contexto do globalSetup não herda as opções use do runner.
+    context.setDefaultTimeout(timeouts.espera);
+    context.setDefaultNavigationTimeout(timeouts.espera);
+    const page = await context.newPage();
+    try {
+      await loginAsTae(page);
+    } catch (error) {
+      await mkdir('test-results', { recursive: true });
+      await page.screenshot({ path: 'test-results/auth-failure.png' });
+      await writeFile('test-results/auth-failure.txt', await page.locator('body').ariaSnapshot());
+      throw error;
+    }
+    await context.storageState({ path: path.resolve(storageState) });
+  } finally {
+    await browser.close();
+  }
 }

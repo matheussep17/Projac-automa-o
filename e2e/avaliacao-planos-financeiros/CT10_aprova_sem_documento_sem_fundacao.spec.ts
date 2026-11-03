@@ -1,15 +1,16 @@
+import { timeouts } from '../../config/timeouts';
 import { test, expect } from '../../fixtures/test';
 import { cadastrarPlanoFinanceiro } from '../../flows/cadastroPlanoFinanceiro';
 import { avaliarPlanoFinanceiro } from '../../flows/avaliacaoPlanoFinanceiro';
 
 test('CT10 - aprova sem documento sem fundacao @avaliacao @sei @sem-fundacao', async ({ page }) => {
-  test.setTimeout(120_000);
+  test.setTimeout(timeouts.avaliacao);
 
-  await cadastrarPlanoFinanceiro(page, {
+  const codigoCriado = await cadastrarPlanoFinanceiro(page, {
     emExecucao: false,
     comFundacao: false,
   });
-  const { processoSei } = await avaliarPlanoFinanceiro(page, {
+  const { processoSei } = await avaliarPlanoFinanceiro(page, { codigoPlano: codigoCriado,
     comFundacao: false,
     comDocumentoContratual: false,
   });
