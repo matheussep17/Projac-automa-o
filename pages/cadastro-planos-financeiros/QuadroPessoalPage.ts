@@ -63,24 +63,20 @@ export class QuadroPessoalPage {
       maximumFractionDigits: 2,
     });
     await expect(valor).toHaveValue(new RegExp(this.escaparRegex(valorEsperado) + '$'));
-    await expect(dialog.getByLabel('Valor total')).toHaveValue(
-      new RegExp(this.escaparRegex(valorEsperado) + '$'),
-    );
+    await expect(dialog.getByLabel('Valor total')).toHaveValue(new RegExp(this.escaparRegex(valorEsperado) + '$'));
 
     await dialog.getByRole('button', { name: 'Adicionar', exact: true }).click();
     await expect(dialog).toBeHidden({ timeout: 10_000 });
-    await expect(this.linhaBolsista(comParticipante)).toContainText('20 mensal');
+    await expect(this.linhaBolsista(comParticipante)).toContainText(/20h? mensal/);
 
     await this.page
       .getByLabel('Justificar os valores dos salários indicando os seus referenciais:')
       .fill(quadroPessoalData.justificativaBolsas);
-    await this.page
-      .getByLabel('Relatar a forma de seleção dos bolsistas:')
-      .fill(quadroPessoalData.criteriosSelecao);
+    await this.page.getByLabel('Relatar a forma de seleção dos bolsistas:').fill(quadroPessoalData.criteriosSelecao);
   }
 
   async validarEAvancar(comParticipante = true): Promise<void> {
-    await expect(this.linhaBolsista(comParticipante)).toContainText('20 mensal');
+    await expect(this.linhaBolsista(comParticipante)).toContainText(/20h? mensal/);
     await this.page.getByRole('button', { name: 'Próxima Etapa' }).click();
   }
 
@@ -91,10 +87,13 @@ export class QuadroPessoalPage {
     await combobox.press('Enter');
     await expect(combobox).toHaveAttribute('aria-expanded', 'true');
     // Há duas opções "Ensino Superior"; preserva a primeira correspondência.
-    const opcao = this.page.getByRole('listbox').getByRole('option', {
-      name: nomeOpcao,
-      exact: true,
-    }).first();
+    const opcao = this.page
+      .getByRole('listbox')
+      .getByRole('option', {
+        name: nomeOpcao,
+        exact: true,
+      })
+      .first();
     await expect(opcao).toBeVisible({ timeout: 10_000 });
     // Não desmarca uma opção já selecionada em um mat-select múltiplo.
     if ((await opcao.getAttribute('aria-selected')) !== 'true') {
@@ -108,9 +107,7 @@ export class QuadroPessoalPage {
   }
 
   private linhaBolsista(comParticipante = true): Locator {
-    const linha = this.page
-      .getByRole('row')
-      .filter({ hasText: 'Bolsista' });
+    const linha = this.page.getByRole('row').filter({ hasText: 'Bolsista' });
     return comParticipante ? linha.filter({ hasText: quadroPessoalData.bolsista }) : linha;
   }
 
