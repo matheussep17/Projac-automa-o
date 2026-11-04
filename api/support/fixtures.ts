@@ -4,6 +4,7 @@ import { baseURL } from '../../config/ambiente';
 import { apiStorageState, apiMetadata } from './auth-state';
 import { timeouts } from '../../config/timeouts';
 import { ProjacApi, Dto } from './client';
+import { withGatewaySession } from './gateway-session';
 
 export const test = base.extend<{ api: ProjacApi }>({
   api: async ({}, use) => {
@@ -17,7 +18,7 @@ export const test = base.extend<{ api: ProjacApi }>({
       extraHTTPHeaders: { Accept: 'application/json', Origin: baseURL, Referer: `${baseURL}/projac/` },
     });
     try {
-      const api = new ProjacApi(context, metadata.perfis);
+      const api = new ProjacApi(withGatewaySession(context, metadata.gateway), metadata.perfis);
       await api.perfil('TAE');
       await use(api);
     } finally { await context.dispose(); }

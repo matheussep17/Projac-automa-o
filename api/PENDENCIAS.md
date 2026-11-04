@@ -22,18 +22,6 @@ npm.cmd run test:api:dev -- api/avaliacao-planos-financeiros --grep CT03
 
 Revisar no backend a criação/aplicação da versão reenviada durante a avaliação inicial. O fluxo de edição pelos avaliadores (CT08) e os ajustes de remanejamento são cenários distintos.
 
-## Cadastro CT05 — payload vazio retorna HTTP 500
-
-Requisição: `POST /projac-comum-service/repercussao-financeira`, multipart com a parte `repercussao` contendo `{}` e tipo `application/json`.
-
-Esperado: erro de validação 4xx, sem exceção interna.
-
-Observado: HTTP 500. O teste mantém essa distinção para não considerar qualquer rejeição como uma validação correta.
-
-```powershell
-npm.cmd run test:api:dev -- api/cadastro-planos-financeiros --grep CT05
-```
-
 ## Autenticação — acesso sem cookies retorna HTTP 500
 
 Requisição: `GET /projac-comum-service/repercussao-financeira/minhas-repercussoes` em contexto HTTP com `storageState` explicitamente vazio e redirecionamentos desativados.

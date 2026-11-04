@@ -37,3 +37,13 @@ npm.cmd run report:api
 ```
 
 As mudanças foram deixadas no diretório de trabalho para revisão, sem commit ou push.
+
+## Revalidacao de remanejamento em 04/11/2026
+
+Executado `npm.cmd run test:api:dev -- api/avaliacao-remanejamento`: **6 passaram**, em aproximadamente 1 minuto e 20 segundos. O relatorio HTML e o JSON atuais correspondem a esta rodada parcial.
+
+Na rodada anterior, o cookie `sagui-gw-bearer` expirou durante a preparacao do CT03; os CT04 a CT06 receberam HTTP 401 na selecao inicial de perfil. O contexto HTTP agora renova esse cookie pela rota `/comum-service/api/gateway/token` antes da expiracao, usando o cookie de sessao existente, sem repetir operacoes de negocio. TypeScript validado com `npm.cmd run typecheck`.
+
+## Atualização da cobertura em 04/11/2026
+
+O antigo CT05 de cadastro (payload vazio) foi removido a pedido. Os antigos CT06, CT07 e CT08 foram renumerados para CT05, CT06 e CT07 na API. A suíte atual tem 23 cenários de negócio e um contrato de autenticação (24 testes). Os resultados anteriores acima são históricos e incluem o cenário removido; os testes de interface mantêm a numeração original.
