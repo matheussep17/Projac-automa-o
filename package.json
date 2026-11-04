@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
+    "test:api": "playwright test --config playwright.api.config.ts",
+    "test:api:dev": "cross-env TEST_ENV=dev TEST_BASE_URL=https://projetosacademicos-dev.ufg.br playwright test --config playwright.api.config.ts",
+    "test:api:homolog": "cross-env TEST_ENV=homolog TEST_BASE_URL=https://projetosacademicos-homolog.ufg.br playwright test --config playwright.api.config.ts",
+    "report:api": "playwright show-report playwright-report/api",
     "test": "playwright test",
     "test:dev": "cross-env TEST_ENV=dev TEST_BASE_URL=https://projetosacademicos-dev.ufg.br playwright test",
     "test:homolog": "cross-env TEST_ENV=homolog TEST_BASE_URL=https://projetosacademicos-homolog.ufg.br playwright test",

@@ -20,9 +20,18 @@ Os testes estão em `e2e/`. O relatório HTML é gerado em `playwright-report/`.
 
 ## Organização
 
+Os [testes de API](api/README.md) têm configuração, execução e relatório próprios:
+
+```powershell
+npm.cmd run test:api:dev
+npm.cmd run test:api:homolog
+npm.cmd run report:api
+```
+
 | Pasta | Conteúdo |
 | --- | --- |
 | `e2e/` | Casos de teste por funcionalidade |
+| `api/` | Cenários de negócio por HTTP, correspondentes aos CTs da interface |
 | `flows/` | Sequências reutilizáveis de cadastro, avaliação e remanejamento |
 | `pages/` | Seletores, preenchimento e verificações das telas |
 | `test-data/` | Valores usados nos cadastros; veja o [guia de dados](test-data/README.md) |
