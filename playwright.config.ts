@@ -36,6 +36,8 @@ export default defineConfig({
     '**/avaliacao-remanejamento/CT04_reprova_remanejamento_sem_fundacao.spec.ts',
     '**/avaliacao-remanejamento/CT05_ajusta_remanejamento_com_fundacao.spec.ts',
     '**/avaliacao-remanejamento/CT06_ajusta_remanejamento_sem_fundacao.spec.ts',
+    '**/avaliacao-remanejamento/CT07_dois_remanejamentos_com_fundacao.spec.ts',
+    '**/avaliacao-remanejamento/CT08_dois_remanejamentos_sem_fundacao.spec.ts',
   ],
 
   fullyParallel: false,

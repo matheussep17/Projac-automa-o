@@ -90,22 +90,23 @@ export async function avaliarRemanejamento(
   page: Page,
   codigoPlano: string,
   config: RemanejamentoConfig,
+  etapas = { atual: '1', nova: '12' },
 ): Promise<void> {
   const perfil = new PerfilPage(page);
   const remanejamento = new RemanejamentoPage(page);
 
-  await test.step('TAE solicita alteração da etapa 1 para 12', async () => {
+  await test.step(`TAE solicita alteração da etapa ${etapas.atual} para ${etapas.nova}`, async () => {
     await perfil.trocarPara('TAE');
     await remanejamento.solicitar(codigoPlano);
-    await new CronogramaPage(page).alterarEtapa('1', '12');
-    await remanejamento.salvarSolicitacao('Alteração da etapa do cronograma de 1 para 12.');
+    await new CronogramaPage(page).alterarEtapa(etapas.atual, etapas.nova);
+    await remanejamento.salvarSolicitacao(`Alteração da etapa do cronograma de ${etapas.atual} para ${etapas.nova}.`);
   });
 
   if (config.comFundacao) {
     await test.step('Fundação aceita as diferenças e aprova o remanejamento', async () => {
       await perfil.trocarPara('Direção Fundação');
       await remanejamento.abrirAvaliacao(codigoPlano);
-      await remanejamento.aprovarCronograma('Alteração da etapa do cronograma conferida e aprovada pela Fundação.');
+      await remanejamento.aprovarCronograma('Alteração da etapa do cronograma conferida e aprovada pela Fundação.', etapas.nova);
       await remanejamento.salvarAvaliacao();
     });
   }
@@ -113,7 +114,7 @@ export async function avaliarRemanejamento(
   await test.step('Gestor Financeiro aprova e envia o remanejamento ao SEI', async () => {
     await perfil.trocarPara('Gestor Financeiro');
     await remanejamento.abrirAvaliacao(codigoPlano);
-    await remanejamento.aprovarCronograma('Remanejamento do cronograma aprovado pelo Gestor Financeiro.');
+    await remanejamento.aprovarCronograma('Remanejamento do cronograma aprovado pelo Gestor Financeiro.', etapas.nova);
     const processoSei = await remanejamento.enviarParaSei();
     expect(processoSei).toMatch(/^\d{5}\.\d{6}\/\d{4}-\d{2}$/);
   });
