@@ -131,3 +131,20 @@ test.describe('Funcionalidade X', () => {
 - **NUNCA** gere código antes da exploração manual completa
 - **NUNCA** use libs externas de asserção (`chai`, `jest`, etc.)
 - **SEMPRE** execute e itere até o teste passar
+
+## Regras para Testes de API
+
+- Use testes de API quando o comportamento puder ser validado sem renderizar a interface.
+- Salve cenários HTTP em `api/` e helpers compartilhados em `api/support/`.
+- Use `APIRequestContext` do Playwright e um cliente centralizado para chamadas comuns.
+- Centralize endpoints e payloads complexos em constantes e factories.
+- Valide status HTTP, estrutura mínima da resposta e campos de negócio relevantes.
+- Após criar ou alterar uma entidade, consulte-a novamente para confirmar a persistência.
+- Use `expect.poll()` apenas para estados assíncronos ou processamento eventual, documentando o motivo.
+- Cada teste deve criar seus próprios dados e não depender da execução de outro teste.
+- Nunca grave credenciais, tokens ou cookies no código ou no repositório.
+- Carregue autenticação por variáveis de ambiente e reutilize `storageState` quando apropriado.
+- Valide explicitamente o perfil autorizado antes de operações dependentes de permissão.
+- Tipar parâmetros e retornos; documentar exceções quando respostas polimórficas exigirem tipos genéricos.
+- Use `test.step()` para registrar etapas de negócio e anexar IDs ou códigos úteis ao diagnóstico.
+- Diferencie falhas de contrato, regra de negócio, autenticação e indisponibilidade do ambiente.
