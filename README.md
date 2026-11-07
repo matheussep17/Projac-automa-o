@@ -7,6 +7,15 @@ npm install
 npx playwright install chromium
 ```
 
+Defina as credenciais antes de executar os testes. Não há credenciais padrão no código:
+
+```powershell
+$env:PROJAC_DEV_LOGIN = 'seu-login'
+$env:PROJAC_DEV_PASSWORD = 'sua-senha'
+```
+
+Também são aceitas as variáveis genéricas `PROJAC_LOGIN` e `PROJAC_PASSWORD`.
+
 ## Execução
 
 ```bash
@@ -28,17 +37,17 @@ npm.cmd run test:api:homolog
 npm.cmd run report:api
 ```
 
-| Pasta | Conteúdo |
-| --- | --- |
-| `e2e/` | Casos de teste por funcionalidade |
-| `api/` | Cenários de negócio por HTTP, correspondentes aos CTs da interface |
-| `flows/` | Sequências reutilizáveis de cadastro, avaliação e remanejamento |
-| `pages/` | Seletores, preenchimento e verificações das telas |
-| `test-data/` | Valores usados nos cadastros; veja o [guia de dados](test-data/README.md) |
-| `fixtures/` | Preparação da sessão e autenticação |
-| `config/` | Configurações compartilhadas |
-| `work/` | Arquivos de apoio, incluindo o PDF anexado aos planos |
-| `test-results/` | Evidências das execuções |
+| Pasta           | Conteúdo                                                                  |
+| --------------- | ------------------------------------------------------------------------- |
+| `e2e/`          | Casos de teste por funcionalidade                                         |
+| `api/`          | Cenários de negócio por HTTP, correspondentes aos CTs da interface        |
+| `flows/`        | Sequências reutilizáveis de cadastro, avaliação e remanejamento           |
+| `pages/`        | Seletores, preenchimento e verificações das telas                         |
+| `test-data/`    | Valores usados nos cadastros; veja o [guia de dados](test-data/README.md) |
+| `fixtures/`     | Preparação da sessão e autenticação                                       |
+| `config/`       | Configurações compartilhadas                                              |
+| `work/`         | Arquivos de apoio, incluindo o PDF anexado aos planos                     |
+| `test-results/` | Evidências das execuções                                                  |
 
 ## Executar em DEV
 

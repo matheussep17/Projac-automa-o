@@ -32,7 +32,10 @@ export class DocumentoContratualPage {
     const campo = this.page.getByLabel('Número do processo SEI');
     if (await campo.count()) {
       await campo.fill(processoSei);
-      await this.page.getByRole('button', { name: /salvar|adicionar/i }).last().click();
+      await this.page
+        .getByRole('button', { name: /salvar|adicionar/i })
+        .last()
+        .click();
     }
   }
 }

@@ -6,9 +6,14 @@ if (nome !== 'dev' && nome !== 'homolog') {
 }
 
 export const ambiente: Ambiente = nome;
-export const baseURL = process.env.TEST_BASE_URL ?? (
-  ambiente === 'dev'
-    ? 'https://projetosacademicos-dev.ufg.br'
-    : 'https://projetosacademicos-homolog.ufg.br'
-);
+export const baseURL =
+  process.env.TEST_BASE_URL ??
+  (ambiente === 'dev' ? 'https://projetosacademicos-dev.ufg.br' : 'https://projetosacademicos-homolog.ufg.br');
+
+try {
+  new URL(baseURL);
+} catch {
+  throw new Error(`TEST_BASE_URL inválida: ${baseURL}`);
+}
+
 export const storageState = `playwright/.auth/${ambiente}.json`;

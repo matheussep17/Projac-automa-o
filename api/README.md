@@ -24,21 +24,21 @@ Cada CT fica em seu próprio arquivo `.spec.ts`, organizado por funcionalidade. 
 
 ## Cobertura
 
-| Grupo | CT | Verificação |
-| --- | --- | --- |
-| Cadastro | CT01–CT02 | Plano em execução com instrumento, com e sem fundação |
-| Cadastro | CT03–CT04 | Plano pendente de avaliação, com e sem fundação |
-| Cadastro | CT05–CT06 | Gravação e consulta de rascunho, com e sem fundação |
-| Cadastro | CT07 | Cadastro sem identificar a pessoa do participante |
-| Avaliação | CT01–CT02 | Aprovação, processo SEI e instrumento contratual |
-| Avaliação | CT03 | Devoluções do gestor e da fundação, ajustes do TAE e aprovação |
-| Avaliação | CT04–CT07 | Reprovação pelo gestor, fundação e gestor final |
-| Avaliação | CT08 | Edição pelos avaliadores e aceite das diferenças pelo TAE |
-| Avaliação | CT09–CT10 | Aprovação sem instrumento; plano permanece aprovado |
-| Remanejamento | CT01–CT02 | Aprovação e persistência da nova etapa do cronograma |
-| Remanejamento | CT03–CT04 | Reprovação preserva a etapa do plano em execução |
-| Remanejamento | CT05–CT06 | Devolução, consulta de pendências, reenvio e aprovação final |
-| Autenticação | Adicional | Acesso sem cookies deve receber resposta de autenticação, sem erro interno |
+| Grupo         | CT        | Verificação                                                                |
+| ------------- | --------- | -------------------------------------------------------------------------- |
+| Cadastro      | CT01–CT02 | Plano em execução com instrumento, com e sem fundação                      |
+| Cadastro      | CT03–CT04 | Plano pendente de avaliação, com e sem fundação                            |
+| Cadastro      | CT05–CT06 | Gravação e consulta de rascunho, com e sem fundação                        |
+| Cadastro      | CT07      | Cadastro sem identificar a pessoa do participante                          |
+| Avaliação     | CT01–CT02 | Aprovação, processo SEI e instrumento contratual                           |
+| Avaliação     | CT03      | Devoluções do gestor e da fundação, ajustes do TAE e aprovação             |
+| Avaliação     | CT04–CT07 | Reprovação pelo gestor, fundação e gestor final                            |
+| Avaliação     | CT08      | Edição pelos avaliadores e aceite das diferenças pelo TAE                  |
+| Avaliação     | CT09–CT10 | Aprovação sem instrumento; plano permanece aprovado                        |
+| Remanejamento | CT01–CT02 | Aprovação e persistência da nova etapa do cronograma                       |
+| Remanejamento | CT03–CT04 | Reprovação preserva a etapa do plano em execução                           |
+| Remanejamento | CT05–CT06 | Devolução, consulta de pendências, reenvio e aprovação final               |
+| Autenticação  | Adicional | Acesso sem cookies deve receber resposta de autenticação, sem erro interno |
 
 Além do status HTTP, os cenários consultam a persistência pelo ID/código retornado, verificam situação, valores, documentos e etapas conforme o fluxo. Não escolhem o último registro de uma lista e não usam IDs fixos de planos ou cadastros auxiliares.
 

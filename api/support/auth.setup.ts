@@ -12,16 +12,19 @@ export default async function setupApi(): Promise<void> {
     const context = await browser.newContext();
     context.setDefaultTimeout(timeouts.espera);
     const page = await context.newPage();
-    const menuResponse = page.waitForResponse(r =>
-      new URL(r.url()).pathname === '/comum-service/menu' && r.ok(),
-    ).then(async response => ({ gateway: new URL(response.url()).origin, menu: await response.json() }));
+    const menuResponse = page
+      .waitForResponse((r) => new URL(r.url()).pathname === '/comum-service/menu' && r.ok())
+      .then(async (response) => ({ gateway: new URL(response.url()).origin, menu: await response.json() }));
     const [{ gateway, menu }] = await Promise.all([menuResponse, loginAsTae(page)]);
     await mkdir('playwright/.auth', { recursive: true });
     await context.storageState({ path: apiStorageState });
-    await writeFile(apiMetadata, JSON.stringify({
-      gateway,
-      perfis: menu.data.perfis,
-    }));
+    await writeFile(
+      apiMetadata,
+      JSON.stringify({
+        gateway,
+        perfis: menu.data.perfis,
+      }),
+    );
   } finally {
     await browser.close();
   }

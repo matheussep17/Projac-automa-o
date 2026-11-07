@@ -3,8 +3,18 @@ import { expect, Page } from '@playwright/test';
 import { ambiente, baseURL } from '../config/ambiente';
 import { ambienteData } from '../test-data/ambientes';
 
-const LOGIN = process.env[`PROJAC_${ambiente.toUpperCase()}_LOGIN`] ?? process.env.PROJAC_LOGIN ?? 'igor_vieira';
-const PASSWORD = process.env[`PROJAC_${ambiente.toUpperCase()}_PASSWORD`] ?? process.env.PROJAC_PASSWORD ?? 'igor_vieira';
+function requiredCredential(name: string): string {
+  const value = process.env[name] ?? process.env[`PROJAC_${ambiente.toUpperCase()}_${name.replace('PROJAC_', '')}`];
+  if (!value) {
+    throw new Error(
+      `Credencial ausente para ${ambiente}. Defina ${name} ou a variável específica do ambiente no processo de execução.`,
+    );
+  }
+  return value;
+}
+
+const LOGIN = requiredCredential('PROJAC_LOGIN');
+const PASSWORD = requiredCredential('PROJAC_PASSWORD');
 const HOME = `${baseURL}/projac/`;
 
 export async function loginAsTae(page: Page): Promise<void> {
@@ -54,9 +64,7 @@ export async function loginAsTae(page: Page): Promise<void> {
     await tae.check();
   }
 
-  await expect(
-    page.getByText(ambienteData.unidade, { exact: true }),
-  ).toBeVisible();
+  await expect(page.getByText(ambienteData.unidade, { exact: true })).toBeVisible();
   await expect(menuButton).toContainText('Tae');
 
   // Fecha o menu de perfil para não deixar o backdrop bloquear os testes.

@@ -8,11 +8,12 @@ export class PerfilPage {
     await test.step(`Trocar perfil para ${perfil}`, async () => {
       const menu = this.page.getByRole('button', { name: /Example icon-button/ });
       await menu.click();
-      const nomePerfil = perfil === 'TAE'
-        ? 'Tae.*Técnico Administrativo'
-        : perfil === 'Direção Fundação'
-          ? 'Direção.*Fundação'
-          : 'Gestor Financeiro';
+      const nomePerfil =
+        perfil === 'TAE'
+          ? 'Tae.*Técnico Administrativo'
+          : perfil === 'Direção Fundação'
+            ? 'Direção.*Fundação'
+            : 'Gestor Financeiro';
       const radio = this.page.getByRole('radio', { name: new RegExp(nomePerfil, 'i') });
       await radio.scrollIntoViewIfNeeded();
       await expect(radio).toBeVisible({ timeout: timeouts.espera });

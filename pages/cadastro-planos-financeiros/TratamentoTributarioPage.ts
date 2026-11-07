@@ -20,15 +20,16 @@ export class TratamentoTributarioPage {
     await expect(modalidade).toBeEnabled();
     await modalidade.focus();
     await modalidade.press('Enter');
-    await this.page.getByRole('listbox').getByRole('option', {
-      name: 'Ensino - Resolução 83 - 2021',
-      exact: true,
-    }).click();
+    await this.page
+      .getByRole('listbox')
+      .getByRole('option', {
+        name: 'Ensino - Resolução 83 - 2021',
+        exact: true,
+      })
+      .click();
     await expect(modalidade).toHaveAttribute('aria-expanded', 'false');
     await expect(modalidade).toHaveText('Ensino - Resolução 83 - 2021');
-    await this.page
-      .getByLabel('Justificativa')
-      .fill(tratamentoTributarioData.justificativa);
+    await this.page.getByLabel('Justificativa').fill(tratamentoTributarioData.justificativa);
     await this.page.keyboard.press('Escape');
     await this.page.getByRole('button', { name: 'Próxima Etapa' }).click({ force: true });
   }

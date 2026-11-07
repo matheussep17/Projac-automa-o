@@ -4,20 +4,20 @@ Execução completa no DEV em 03/11/2026, com `npm.cmd run test:api:dev`.
 
 **25 testes executados: 22 passaram e 3 falharam.** Sem testes ignorados, sem resultados intermitentes na rodada final e sem repetição automática. Duração: aproximadamente 3 minutos e 5 segundos.
 
-| Grupo | Passaram | Falharam |
-| --- | --- | --- |
-| Cadastro de planos financeiros | 7 | 1 |
-| Avaliação de planos financeiros | 9 | 1 |
-| Avaliação de remanejamento | 6 | 0 |
-| Contrato de autenticação | 0 | 1 |
+| Grupo                           | Passaram | Falharam |
+| ------------------------------- | -------- | -------- |
+| Cadastro de planos financeiros  | 7        | 1        |
+| Avaliação de planos financeiros | 9        | 1        |
+| Avaliação de remanejamento      | 6        | 0        |
+| Contrato de autenticação        | 0        | 1        |
 
 ## Falhas reproduzidas
 
-| Cenário | Esperado | Observado |
-| --- | --- | --- |
-| Avaliação CT03 | Etapa 1234 persistida após os ajustes | Etapa 1 na consulta final |
-| Cadastro CT05 | Payload vazio rejeitado com validação 4xx | HTTP 500 |
-| Acesso sem sessão | 401/403 ou redirecionamento de autenticação | HTTP 500 |
+| Cenário           | Esperado                                    | Observado                 |
+| ----------------- | ------------------------------------------- | ------------------------- |
+| Avaliação CT03    | Etapa 1234 persistida após os ajustes       | Etapa 1 na consulta final |
+| Cadastro CT05     | Payload vazio rejeitado com validação 4xx   | HTTP 500                  |
+| Acesso sem sessão | 401/403 ou redirecionamento de autenticação | HTTP 500                  |
 
 As requisições e os comandos de reprodução estão em [PENDENCIAS.md](PENDENCIAS.md). A divergência da etapa também foi conferida em um plano produzido pelo fluxo de interface. Nenhuma dessas falhas foi transformada em sucesso ou desabilitada na suíte.
 

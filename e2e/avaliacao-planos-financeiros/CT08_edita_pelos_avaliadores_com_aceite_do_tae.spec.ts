@@ -1,5 +1,4 @@
 import { timeouts } from '../../config/timeouts';
-import path from 'node:path';
 import { expect, test } from '../../fixtures/test';
 import { cadastrarPlanoFinanceiro } from '../../flows/cadastroPlanoFinanceiro';
 import { AvaliacaoPlanoPage } from '../../pages/avaliacao-planos-financeiros/AvaliacaoPlanoPage';
@@ -8,7 +7,9 @@ import { CronogramaPage } from '../../pages/cadastro-planos-financeiros/Cronogra
 import { DocumentoContratualPage } from '../../pages/cadastro-planos-financeiros/DocumentoContratualPage';
 import { PlanoTrabalhoPage } from '../../pages/cadastro-planos-financeiros/PlanoTrabalhoPage';
 
-test('CT08 - avaliadores editam plano e TAE aceita as diferencas com fundacao @avaliacao @ajuste @fundacao', async ({ page }) => {
+test('CT08 - avaliadores editam plano e TAE aceita as diferencas com fundacao @avaliacao @ajuste @fundacao', async ({
+  page,
+}) => {
   test.setTimeout(timeouts.ajustes);
   const codigoCriado = await cadastrarPlanoFinanceiro(page, { emExecucao: false, comFundacao: true });
 

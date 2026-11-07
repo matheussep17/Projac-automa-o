@@ -106,7 +106,10 @@ export async function avaliarRemanejamento(
     await test.step('Fundação aceita as diferenças e aprova o remanejamento', async () => {
       await perfil.trocarPara('Direção Fundação');
       await remanejamento.abrirAvaliacao(codigoPlano);
-      await remanejamento.aprovarCronograma('Alteração da etapa do cronograma conferida e aprovada pela Fundação.', etapas.nova);
+      await remanejamento.aprovarCronograma(
+        'Alteração da etapa do cronograma conferida e aprovada pela Fundação.',
+        etapas.nova,
+      );
       await remanejamento.salvarAvaliacao();
     });
   }

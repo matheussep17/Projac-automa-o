@@ -21,7 +21,9 @@ export class RemanejamentoPage {
     const linha = await this.abrirPlanoNaLista(codigo);
     await expect(linha.getByRole('cell', { name: 'Em execução', exact: true })).toBeVisible();
     await linha.getByRole('button', { name: 'Solicitar Remanejamento', exact: true }).click();
-    await expect(this.page.getByRole('heading', { name: 'Alterar Plano de Trabalho Financeiro', exact: true })).toBeVisible();
+    await expect(
+      this.page.getByRole('heading', { name: 'Alterar Plano de Trabalho Financeiro', exact: true }),
+    ).toBeVisible();
   }
 
   async salvarSolicitacao(justificativa: string): Promise<void> {
@@ -36,14 +38,17 @@ export class RemanejamentoPage {
   async abrirAvaliacao(codigo: string): Promise<void> {
     await this.page.goto('/projac/plano-trabalho-financeiro');
     await this.page.getByText('Avaliação de Alterações', { exact: true }).first().click();
-    await expect(this.page.getByRole('tab', { name: 'Pendente', exact: true })).toHaveAttribute('aria-selected', 'true');
+    await expect(this.page.getByRole('tab', { name: 'Pendente', exact: true })).toHaveAttribute(
+      'aria-selected',
+      'true',
+    );
     const tabela = this.page.getByRole('tabpanel', { name: 'Pendente', exact: true }).getByRole('table');
     const linha = tabela.getByRole('row').filter({
       has: this.page.getByRole('cell', { name: codigo, exact: true }),
     });
     const proxima = this.page.getByRole('button', { name: 'Próxima Página', exact: true });
     await expect(tabela).not.toContainText('CARREGANDO', { timeout: timeouts.espera });
-    while (!(await linha.count()) && await proxima.isEnabled()) {
+    while (!(await linha.count()) && (await proxima.isEnabled())) {
       const anterior = await tabela.innerText();
       await proxima.click();
       await expect(tabela).not.toHaveText(anterior);
@@ -52,18 +57,30 @@ export class RemanejamentoPage {
     if (!(await linha.count())) {
       // A solicitação pode levar alguns segundos para entrar na fila do
       // avaliador após o salvamento feito pelo TAE.
-      await expect.poll(
-        async () => {
-          if (await linha.count()) return true;
-          await this.page.goto('/projac/plano-trabalho-financeiro');
-          await this.page.getByText('Avaliação de Alterações', { exact: true }).first().click();
-          await expect(this.page.getByRole('tab', { name: 'Pendente', exact: true })).toHaveAttribute('aria-selected', 'true');
-          const tabelaAtualizada = this.page.getByRole('tabpanel', { name: 'Pendente', exact: true }).getByRole('table');
-          await expect(tabelaAtualizada).not.toContainText('CARREGANDO', { timeout: timeouts.espera });
-          return (await tabelaAtualizada.getByRole('row').filter({ has: this.page.getByRole('cell', { name: codigo, exact: true }) }).count()) > 0;
-        },
-        { timeout: timeouts.espera, intervals: [500, 1_000, 2_000] },
-      ).toBe(true);
+      await expect
+        .poll(
+          async () => {
+            if (await linha.count()) return true;
+            await this.page.goto('/projac/plano-trabalho-financeiro');
+            await this.page.getByText('Avaliação de Alterações', { exact: true }).first().click();
+            await expect(this.page.getByRole('tab', { name: 'Pendente', exact: true })).toHaveAttribute(
+              'aria-selected',
+              'true',
+            );
+            const tabelaAtualizada = this.page
+              .getByRole('tabpanel', { name: 'Pendente', exact: true })
+              .getByRole('table');
+            await expect(tabelaAtualizada).not.toContainText('CARREGANDO', { timeout: timeouts.espera });
+            return (
+              (await tabelaAtualizada
+                .getByRole('row')
+                .filter({ has: this.page.getByRole('cell', { name: codigo, exact: true }) })
+                .count()) > 0
+            );
+          },
+          { timeout: timeouts.espera, intervals: [500, 1_000, 2_000] },
+        )
+        .toBe(true);
     }
     await expect(linha).toBeVisible({ timeout: timeouts.espera });
     await linha.getByRole('button', { name: 'Avaliar', exact: true }).click();
@@ -94,16 +111,20 @@ export class RemanejamentoPage {
     await expect(aba).toBeVisible({ timeout: timeouts.espera });
     await aba.click();
     await expect(aba).toHaveAttribute('aria-selected', 'true');
-    const solicitacao = this.page.getByRole('tabpanel', { name: /^Aguardando ajustes$/i })
-      .getByRole('row').filter({
+    const solicitacao = this.page
+      .getByRole('tabpanel', { name: /^Aguardando ajustes$/i })
+      .getByRole('row')
+      .filter({
         has: this.page.getByRole('cell', { name: codigo, exact: true }),
       });
     await expect(solicitacao).toBeVisible({ timeout: timeouts.espera });
     await solicitacao.getByRole('button', { name: /ajust(?:e|ar).*plano.*financeiro/i }).click();
-    await expect(this.page.getByRole('heading', {
-      name: 'Revisar Solicitação de Remanejamento',
-      exact: true,
-    })).toBeVisible();
+    await expect(
+      this.page.getByRole('heading', {
+        name: 'Revisar Solicitação de Remanejamento',
+        exact: true,
+      }),
+    ).toBeVisible();
   }
 
   async deixarPendenteDeAjustes(justificativa: string, etapa: string): Promise<void> {
@@ -126,7 +147,9 @@ export class RemanejamentoPage {
   async salvarAvaliacao(): Promise<void> {
     await this.page.getByRole('button', { name: /Atualizar|Salvar/i, exact: true }).click();
     await this.confirmar();
-    await expect(this.page.getByText('Avaliação do Plano de Trabalho salvo(a) com sucesso!', { exact: true })).toBeVisible();
+    await expect(
+      this.page.getByText('Avaliação do Plano de Trabalho salvo(a) com sucesso!', { exact: true }),
+    ).toBeVisible();
   }
 
   async enviarParaSei(): Promise<string> {
@@ -135,9 +158,10 @@ export class RemanejamentoPage {
     await expect(enviar).toBeEnabled();
     await enviar.click();
     const [resposta] = await Promise.all([
-      this.page.waitForResponse((response) =>
-        response.request().method() === 'POST' &&
-        new URL(response.url()).pathname.includes('/solicitacao-alteracao/enviar-plano-financeiro-para-sei/'),
+      this.page.waitForResponse(
+        (response) =>
+          response.request().method() === 'POST' &&
+          new URL(response.url()).pathname.includes('/solicitacao-alteracao/enviar-plano-financeiro-para-sei/'),
       ),
       this.confirmar(),
     ]);

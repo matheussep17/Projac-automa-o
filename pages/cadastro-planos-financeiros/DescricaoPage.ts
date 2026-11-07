@@ -13,7 +13,9 @@ export class DescricaoPage {
   constructor(private readonly page: Page) {}
 
   async preencher(config: ConfiguracaoDescricao): Promise<void> {
-    await expect(this.page.getByRole('heading', { name: 'Descrição', exact: true })).toBeVisible({ timeout: timeouts.espera });
+    await expect(this.page.getByRole('heading', { name: 'Descrição', exact: true })).toBeVisible({
+      timeout: timeouts.espera,
+    });
     const usuariosAssistentes = this.page.getByRole('combobox', {
       name: 'Usuários assistentes',
     });
@@ -39,9 +41,7 @@ export class DescricaoPage {
       ).not.toBeChecked();
     }
 
-    await this.page
-      .getByLabel('Objetivo(s) do Plano de Trabalho Financeiro')
-      .fill(descricaoData.objetivo);
+    await this.page.getByLabel('Objetivo(s) do Plano de Trabalho Financeiro').fill(descricaoData.objetivo);
     await this.page.getByLabel('Entidade financiadora').click({ force: true });
     const bancoDoBrasil = this.page.getByRole('option', {
       name: 'Banco do Brasil',
@@ -64,9 +64,7 @@ export class DescricaoPage {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     });
-    await expect(valor).toHaveValue(
-      new RegExp(`(?:^|\\s)${valorEsperado.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`),
-    );
+    await expect(valor).toHaveValue(new RegExp(`(?:^|\\s)${valorEsperado.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`));
     await this.page.getByRole('radio', { name: 'Público', exact: true }).check();
 
     await this.page.getByLabel('Tipo do instrumento do recurso financeiro').click({ force: true });

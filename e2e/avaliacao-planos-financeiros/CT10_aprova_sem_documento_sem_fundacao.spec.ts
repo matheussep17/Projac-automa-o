@@ -10,7 +10,8 @@ test('CT10 - aprova sem documento sem fundacao @avaliacao @sei @sem-fundacao', a
     emExecucao: false,
     comFundacao: false,
   });
-  const { processoSei } = await avaliarPlanoFinanceiro(page, { codigoPlano: codigoCriado,
+  const { processoSei } = await avaliarPlanoFinanceiro(page, {
+    codigoPlano: codigoCriado,
     comFundacao: false,
     comDocumentoContratual: false,
   });

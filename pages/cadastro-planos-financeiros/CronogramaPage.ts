@@ -35,7 +35,9 @@ export class CronogramaPage {
     await inicio.fill(inicioOriginal);
     // A mudança do início recalcula o término; preservamos o período cadastrado.
     await termino.fill(terminoOriginal);
-    await dialogo.getByRole('button', { name: /Atualizar|Adicionar/i, exact: true }).click({ timeout: timeouts.espera });
+    await dialogo
+      .getByRole('button', { name: /Atualizar|Adicionar/i, exact: true })
+      .click({ timeout: timeouts.espera });
     await expect(dialogo).toBeHidden();
     const alterada = this.page.getByRole('row').filter({
       has: this.page.getByRole('cell', { name: nova, exact: true }),

@@ -23,8 +23,14 @@ export type CadastroPlanoConfig = {
   comDocumentoContratual?: boolean;
 };
 
-export function cadastrarPlanoFinanceiro(page: Page, config: CadastroPlanoConfig & { salvarComoRascunho: true }): Promise<void>;
-export function cadastrarPlanoFinanceiro(page: Page, config: CadastroPlanoConfig & { salvarComoRascunho?: false }): Promise<string>;
+export function cadastrarPlanoFinanceiro(
+  page: Page,
+  config: CadastroPlanoConfig & { salvarComoRascunho: true },
+): Promise<void>;
+export function cadastrarPlanoFinanceiro(
+  page: Page,
+  config: CadastroPlanoConfig & { salvarComoRascunho?: false },
+): Promise<string>;
 export async function cadastrarPlanoFinanceiro(page: Page, config: CadastroPlanoConfig): Promise<string | void> {
   const pdf = path.resolve('work/anexo-teste.pdf');
   const plano = new PlanoTrabalhoPage(page);
@@ -34,7 +40,9 @@ export async function cadastrarPlanoFinanceiro(page: Page, config: CadastroPlano
   await projeto.anexarExtrato(pdf);
   const coordenacao = new CoordenacaoAprovacaoPage(page);
   await coordenacao.preencherViceCoordenador();
-  await expect(page.getByLabel(/Matr.*cula SIAPE vice-coordenador\(a\)/i)).toHaveValue(sharedData.matriculaViceCoordenador);
+  await expect(page.getByLabel(/Matr.*cula SIAPE vice-coordenador\(a\)/i)).toHaveValue(
+    sharedData.matriculaViceCoordenador,
+  );
   await coordenacao.preencherAprovacao(pdf);
   await coordenacao.avancar();
   const descricao = new DescricaoPage(page);
@@ -59,9 +67,10 @@ export async function cadastrarPlanoFinanceiro(page: Page, config: CadastroPlano
   }
   return test.step('Salvar plano e capturar o codigo criado', async () => {
     const [resposta] = await Promise.all([
-      page.waitForResponse(response =>
-        response.request().method() === 'POST' &&
-        new URL(response.url()).pathname.endsWith('/repercussao-financeira'),
+      page.waitForResponse(
+        (response) =>
+          response.request().method() === 'POST' &&
+          new URL(response.url()).pathname.endsWith('/repercussao-financeira'),
       ),
       plano.conferirESalvar(),
     ]);

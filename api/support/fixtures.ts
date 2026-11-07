@@ -1,4 +1,4 @@
-import { test as base, expect, request } from '@playwright/test';
+import { test as base, expect, request as createRequestContext } from '@playwright/test';
 import { readFile } from 'node:fs/promises';
 import { baseURL } from '../../config/ambiente';
 import { apiStorageState, apiMetadata } from './auth-state';
@@ -7,11 +7,10 @@ import { ProjacApi, Dto } from './client';
 import { withGatewaySession } from './gateway-session';
 
 export const test = base.extend<{ api: ProjacApi }>({
-  api: async ({}, use) => {
-    const metadata: { gateway: string; perfis: Dto[] } = JSON.parse(
-      await readFile(apiMetadata, 'utf8'),
-    );
-    const context = await request.newContext({
+  api: async ({ request }, use) => {
+    void request;
+    const metadata: { gateway: string; perfis: Dto[] } = JSON.parse(await readFile(apiMetadata, 'utf8'));
+    const context = await createRequestContext.newContext({
       baseURL: metadata.gateway,
       storageState: apiStorageState,
       timeout: timeouts.espera,
@@ -21,7 +20,9 @@ export const test = base.extend<{ api: ProjacApi }>({
       const api = new ProjacApi(withGatewaySession(context, metadata.gateway), metadata.perfis);
       await api.perfil('TAE');
       await use(api);
-    } finally { await context.dispose(); }
+    } finally {
+      await context.dispose();
+    }
   },
 });
 export { expect };

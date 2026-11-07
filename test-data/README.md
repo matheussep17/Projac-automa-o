@@ -3,20 +3,20 @@
 Os testes de cadastro, avaliação e remanejamento reutilizam estes dados para preparar os planos.
 Páginas e fluxos importam os valores pelo `test-data/index.ts`.
 
-| Informação | Arquivo |
-| --- | --- |
-| Orçamento total, bolsas com/sem fundação, DAO e custos indiretos | `plano-financeiro/orcamento.data.ts` |
-| Início e fim do plano e dados do vice-coordenador | `comum/plano.data.ts` |
-| Objetivo, assistente e telefone institucional | `plano-financeiro/descricao.data.ts` |
-| Etapa, descrição e quantidade do cronograma | `plano-financeiro/cronograma.data.ts` |
-| Indicador e meta | `plano-financeiro/indicador-meta.data.ts` |
-| Parcela, receita e valor do desembolso | `plano-financeiro/desembolso.data.ts` |
-| Distribuição dos valores com e sem fundação | `plano-financeiro/plano-aplicacao.data.ts` |
-| Recursos da UFG | `plano-financeiro/recursos-ufg.data.ts` |
-| Bolsista, período, bolsas, carga horária e remuneração | `plano-financeiro/quadro-pessoal.data.ts` |
-| Justificativa tributária | `plano-financeiro/tratamento-tributario.data.ts` |
-| Instrumento e processo SEI de referência | `plano-financeiro/documento-contratual.data.ts` |
-| Valores e ano dos encargos | `plano-financeiro/encargos.data.ts` |
+| Informação                                                       | Arquivo                                          |
+| ---------------------------------------------------------------- | ------------------------------------------------ |
+| Orçamento total, bolsas com/sem fundação, DAO e custos indiretos | `plano-financeiro/orcamento.data.ts`             |
+| Início e fim do plano e dados do vice-coordenador                | `comum/plano.data.ts`                            |
+| Objetivo, assistente e telefone institucional                    | `plano-financeiro/descricao.data.ts`             |
+| Etapa, descrição e quantidade do cronograma                      | `plano-financeiro/cronograma.data.ts`            |
+| Indicador e meta                                                 | `plano-financeiro/indicador-meta.data.ts`        |
+| Parcela, receita e valor do desembolso                           | `plano-financeiro/desembolso.data.ts`            |
+| Distribuição dos valores com e sem fundação                      | `plano-financeiro/plano-aplicacao.data.ts`       |
+| Recursos da UFG                                                  | `plano-financeiro/recursos-ufg.data.ts`          |
+| Bolsista, período, bolsas, carga horária e remuneração           | `plano-financeiro/quadro-pessoal.data.ts`        |
+| Justificativa tributária                                         | `plano-financeiro/tratamento-tributario.data.ts` |
+| Instrumento e processo SEI de referência                         | `plano-financeiro/documento-contratual.data.ts`  |
+| Valores e ano dos encargos                                       | `plano-financeiro/encargos.data.ts`              |
 
 ## Como editar
 

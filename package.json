@@ -22,9 +22,14 @@
     "quality": "npm run typecheck && npm run lint && npm run format:check"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@playwright/test": "latest",
     "@types/node": "latest",
     "cross-env": "^10.1.0",
-    "typescript": "latest"
+    "eslint": "^10.14.0",
+    "eslint-config-prettier": "^10.1.8",
+    "prettier": "^3.9.10",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.72.1"
   }
 }

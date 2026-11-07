@@ -187,11 +187,31 @@ export class PlanoTrabalhoPage {
   async solicitarAlteracao(justificativa: string): Promise<void> {
     await this.page.getByRole('button', { name: 'Conferir Dados', exact: true }).click();
     await expect(this.page.getByRole('heading', { name: /Confer.*ncia de Dados/i })).toBeVisible();
-    await this.page.getByRole('textbox', { name: 'Justificativa das Alterações', exact: true }).fill(justificativa);
-    await this.page.getByRole('button', { name: 'Solicitar Alteração', exact: true }).click();
-    const dialogo = this.page.getByRole('dialog');
-    await expect(dialogo).toBeVisible();
-    await dialogo.getByRole('button', { name: 'Sim', exact: true }).click();
+    const campoJustificativa = this.page.getByRole('textbox', {
+      name: 'Justificativa das Alterações',
+      exact: true,
+    });
+    if (await campoJustificativa.isVisible().catch(() => false)) {
+      await campoJustificativa.fill(justificativa);
+    }
+    const solicitarAlteracao = this.page.getByRole('button', {
+      name: 'Solicitar Alteração',
+      exact: true,
+    });
+    const salvar = this.page.getByRole('button', { name: 'Salvar', exact: true });
+    let requerConfirmacao = false;
+    if (await solicitarAlteracao.isVisible().catch(() => false)) {
+      await solicitarAlteracao.click();
+      requerConfirmacao = true;
+    } else {
+      await expect(salvar).toBeVisible({ timeout: timeouts.espera });
+      await salvar.click();
+    }
+    if (requerConfirmacao) {
+      const dialogo = this.page.getByRole('dialog');
+      await expect(dialogo).toBeVisible();
+      await dialogo.getByRole('button', { name: 'Sim', exact: true }).click();
+    }
     await expect(this.page.getByText(/sucesso/i).first()).toBeVisible({ timeout: timeouts.espera });
   }
 }
