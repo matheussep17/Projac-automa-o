@@ -3,9 +3,12 @@ import { ProjacApi, Dto, Perfil, planosPath, avaliacoesPath } from './client';
 import { CadastroApiConfig, montarPlano, dataIso } from './plano.factory';
 import { sharedData, documentoContratualData } from '../../test-data';
 
-export async function cadastrar(api: ProjacApi, config: CadastroApiConfig): Promise<Dto> {
+export async function cadastrar(
+  api: ProjacApi,
+  config: CadastroApiConfig & { perfilCadastro?: Perfil },
+): Promise<Dto> {
   return test.step('API: cadastrar plano completo e consultar persistência', async () => {
-    await api.perfil('TAE');
+    await api.perfil(config.perfilCadastro ?? 'TAE');
     const body = await montarPlano(api, config);
     if (config.comDocumentoContratual) body.instrumentosFormalizacao = [await documento(api, body)];
     const response = await api.ok(

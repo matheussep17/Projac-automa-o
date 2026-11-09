@@ -21,6 +21,7 @@ export type CadastroPlanoConfig = {
   salvarComoRascunho?: boolean;
   comParticipante?: boolean;
   comDocumentoContratual?: boolean;
+  usarProjetoDisponivel?: boolean;
 };
 
 export function cadastrarPlanoFinanceiro(
@@ -36,7 +37,7 @@ export async function cadastrarPlanoFinanceiro(page: Page, config: CadastroPlano
   const plano = new PlanoTrabalhoPage(page);
   await plano.iniciarCadastro();
   const projeto = new ProjetoPage(page);
-  await projeto.selecionarNaturezaEProjeto();
+  await projeto.selecionarNaturezaEProjeto(config.usarProjetoDisponivel);
   await projeto.anexarExtrato(pdf);
   const coordenacao = new CoordenacaoAprovacaoPage(page);
   await coordenacao.preencherViceCoordenador();

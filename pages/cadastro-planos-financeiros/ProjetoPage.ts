@@ -5,7 +5,7 @@ import { expect, Page } from '@playwright/test';
 export class ProjetoPage {
   constructor(private readonly page: Page) {}
 
-  async selecionarNaturezaEProjeto(): Promise<void> {
+  async selecionarNaturezaEProjeto(usarProjetoDisponivel = false): Promise<void> {
     await this.page.getByRole('tab', { name: 'Dados do Projeto' }).click();
     const natureza = this.page.getByRole('combobox', { name: 'Natureza' });
     await expect(natureza).toBeVisible();
@@ -25,8 +25,20 @@ export class ProjetoPage {
     await expect(natureza).toHaveAttribute('aria-expanded', 'false');
     const projeto = this.page.getByRole('combobox', { name: 'Projeto' });
     await projeto.click();
-    await projeto.fill(ambienteData.projeto);
-    const nomeProjeto = ambienteData.projeto.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    let projetoEscolhido = ambienteData.projeto;
+    if (usarProjetoDisponivel) {
+      await projeto.fill('');
+      const opcoes = this.page.getByRole('listbox').getByRole('option', { disabled: false });
+      await expect.poll(async () => (await opcoes.allTextContents()).some(texto => texto.trim().length > 0), {
+        timeout: timeouts.espera,
+        message: 'Deve existir um projeto disponível para o Gestor Financeiro',
+      }).toBe(true);
+      const nomes = await opcoes.allTextContents();
+      projetoEscolhido = nomes.find(texto => texto.trim().length > 0)!.trim()
+        .replace(/^[A-Z]+\d+-\d{4}\s*-\s*/, '');
+    }
+    await projeto.fill(projetoEscolhido);
+    const nomeProjeto = projetoEscolhido.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const nomeComCodigoOpcional = new RegExp(`^(?:[A-Z]+\\d+-\\d{4}\\s*-\\s*)?${nomeProjeto}$`);
     const opcao = this.page.getByRole('option', { name: nomeComCodigoOpcional });
     await expect(opcao).toBeVisible({ timeout: timeouts.espera });

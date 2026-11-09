@@ -1,9 +1,11 @@
 import { test as base } from '@playwright/test';
-import { loginAsTae } from './auth';
+import { loginComPerfil } from './auth';
+import { Perfil } from '../pages/avaliacao-planos-financeiros/PerfilPage';
 
-export const test = base.extend({
-  page: async ({ page }, use) => {
-    await base.step('Autenticar e selecionar perfil TAE', () => loginAsTae(page));
+export const test = base.extend<{ perfilInicial: Perfil }>({
+  perfilInicial: ['TAE', { option: true }],
+  page: async ({ page, perfilInicial }, use) => {
+    await base.step(`Autenticar e selecionar perfil ${perfilInicial}`, () => loginComPerfil(page, perfilInicial));
 
     await use(page);
   },

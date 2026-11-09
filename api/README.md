@@ -52,7 +52,7 @@ Além do status HTTP, os cenários consultam a persistência pelo ID/código ret
 - `support/flows.ts`: cadastro, decisões, documentos e ajustes na avaliação.
 - `support/remanejamento.ts`: solicitações, decisões e reenvios de remanejamento.
 
-Os valores são compartilhados com a interface em `test-data/`, incluindo o orçamento centralizado. Projeto, natureza e fundação vêm de `test-data/ambientes/`. Login e senha aceitam as mesmas variáveis dos testes de interface, como `PROJAC_DEV_LOGIN` e `PROJAC_HOMOLOG_PASSWORD`.
+Os valores são compartilhados com a interface em `test-data/`, incluindo o orçamento centralizado. Projeto, natureza e fundação vêm de `test-data/ambientes/`. Login e senha são compartilhados com a interface em `fixtures/auth.ts`, sem necessidade de carregar um arquivo `.env`.
 
 O gateway é descoberto durante o login, sem fixar domínio de DEV em chamadas de homologação. Credenciais e cookies ficam fora do Git em `playwright/.auth/`. A API usa seu próprio arquivo de sessão (`*-api-session.json`), separado da interface.
 

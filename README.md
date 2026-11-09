@@ -7,14 +7,7 @@ npm install
 npx playwright install chromium
 ```
 
-Defina as credenciais antes de executar os testes. Não há credenciais padrão no código:
-
-```powershell
-$env:PROJAC_DEV_LOGIN = 'seu-login'
-$env:PROJAC_DEV_PASSWORD = 'sua-senha'
-```
-
-Também são aceitas as variáveis genéricas `PROJAC_LOGIN` e `PROJAC_PASSWORD`.
+Login e senha de DEV e homologação estão definidos em `fixtures/auth.ts`. Não é necessário carregar um arquivo `.env` para executar os testes.
 
 ## Execução
 

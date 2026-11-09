@@ -44,9 +44,7 @@ Para adicionar dados, crie um arquivo `*.data.ts` na pasta do domínio e exporte
 `config/ambiente.ts` centraliza a URL e o arquivo de sessão utilizado.
 
 É possível substituir os dados sem editar os arquivos usando `PROJAC_PROJETO`, `PROJAC_NATUREZA`, `PROJAC_FUNDACAO` e `PROJAC_UNIDADE`.
-Para autenticação, use `PROJAC_DEV_LOGIN` / `PROJAC_DEV_PASSWORD` ou `PROJAC_HOMOLOG_LOGIN` / `PROJAC_HOMOLOG_PASSWORD`.
-As variáveis genéricas `PROJAC_LOGIN` / `PROJAC_PASSWORD` continuam válidas como alternativa. A implementação está em `fixtures/auth.ts`.
-Defina essas variáveis no terminal ou no ambiente de execução; arquivos `.env` não são carregados automaticamente.
+Login e senha dos dois ambientes estão definidos em `fixtures/auth.ts`, sem necessidade de variáveis ou arquivo `.env` para autenticação.
 
 ## Código do plano criado
 
