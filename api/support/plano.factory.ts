@@ -50,7 +50,6 @@ export async function montarPlano(api: ProjacApi, config: CadastroApiConfig): Pr
       'matricula',
       matricula,
     );
-  const coordenador = await empregado(usuario.perfilAtual.vinculoSelecionado.matricula);
   const vice = await empregado(sharedData.matriculaViceCoordenador);
   const assistente = escolher(
     await api.list(`${integracao}/vinculo/paginado`, {
@@ -68,6 +67,12 @@ export async function montarPlano(api: ProjacApi, config: CadastroApiConfig): Pr
     'tituloProjeto',
     ambienteData.projeto,
   );
+  // Gestor Financeiro não possui vínculo funcional selecionado no perfil.
+  // Nesse caso, o coordenador vem do projeto escolhido, como no cadastro pela interface.
+  const matriculaCoordenador = usuario.perfilAtual.vinculoSelecionado?.matricula
+    ?? projeto.dadosCoordenador?.matricula;
+  expect(matriculaCoordenador, 'Matrícula do coordenador do plano/projeto').toBeTruthy();
+  const coordenador = await empregado(String(matriculaCoordenador));
   const funcoes = await api.list(`${comum}/funcao-membro-projeto/paginado`, {
     search_coordenacaoProjetoAcademico: true,
   });
