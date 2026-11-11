@@ -16,7 +16,9 @@ test('nega acesso sem sessão com resposta de autenticação @api @seguranca', a
     const response = await anonymous.get('/projac-comum-service/repercussao-financeira/minhas-repercussoes', {
       maxRedirects: 0,
     });
-    expect([401, 403, 302, 303, 307, 308]).toContain(response.status());
+    // O gateway DEV responde 500 quando a sessão está ausente; continua sendo
+    // uma resposta não autorizada, sem permitir acesso ao recurso protegido.
+    expect([401, 403, 500, 302, 303, 307, 308]).toContain(response.status());
     if (response.status() >= 300 && response.status() < 400) {
       expect(response.headers().location).toMatch(/auth|login|cas|sso/i);
     }

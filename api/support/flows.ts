@@ -82,13 +82,23 @@ export async function aprovar(api: ProjacApi, plano: Dto, comFundacao: boolean, 
     await avaliar(api, plano.id, 'Direção Fundação', 'Aprovada');
   }
   await avaliar(api, plano.id, 'Gestor Financeiro', 'Aprovada');
-  const response = await api.ok(
-    await api.request.post(`${avaliacoesPath}/criar-processo-sei/${plano.id}`, { data: {} }),
-  );
-  const sei = await response.json();
+  const sei = await criarProcessoSei(api, plano.id);
   expect(sei.numeroProcesso).toMatch(/^\d{5}\.\d{6}\/\d{4}-\d{2}$/);
   await api.conferirSituacao(plano.id, 'Aprovada');
   if (documento) await vincularDocumento(api, plano.id, sei.numeroProcesso);
+}
+
+export async function criarProcessoSei(api: ProjacApi, id: number): Promise<Dto> {
+  const atual = await api.entity(`${avaliacoesPath}/ultima-avaliacao/${id}`);
+  const body = {
+    id: atual.id,
+    situacao: 'Aprovada',
+    justificativa: 'Criação do processo SEI pela API',
+  };
+  const response = await api.ok(
+    await api.multipart('post', `${avaliacoesPath}/${id}?enviarParaSEI=true`, 'avaliacao', body),
+  );
+  return response.json();
 }
 
 export async function vincularDocumento(api: ProjacApi, id: number, processo: string): Promise<void> {

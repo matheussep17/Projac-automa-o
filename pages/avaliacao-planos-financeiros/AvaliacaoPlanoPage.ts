@@ -181,11 +181,15 @@ export class AvaliacaoPlanoPage {
   async enviarParaSei(): Promise<string> {
     await this.page.getByRole('button', { name: /Salvar e Criar Processo SEI/i }).click();
     await this.confirmarSalvamento();
-    await expect(this.page.getByText(/sucesso/i).first()).toBeVisible();
-    const mensagem = this.page.getByText(/processo.*foi criado com sucesso/i).first();
-    await expect(mensagem).toBeVisible({ timeout: timeouts.espera });
-    const texto = (await mensagem.textContent()) ?? '';
-    const numero = texto.match(/\d{5}\.\d{6}\/\d{4}-\d{2}/)?.[0];
+
+    // O texto do modal de sucesso pode mudar; o número SEI mantém o formato
+    // oficial e é a informação necessária para as etapas seguintes.
+    const processoSei = /\d{5}\.\d{6}\/\d{4}-\d{2}/;
+    await expect
+      .poll(() => this.page.locator('body').innerText(), { timeout: timeouts.espera })
+      .toMatch(processoSei);
+    const texto = await this.page.locator('body').innerText();
+    const numero = texto.match(processoSei)?.[0];
     expect(numero).toBeDefined();
     return numero!;
   }

@@ -1,6 +1,5 @@
 import { test, expect } from '../support/fixtures';
-import { cadastrar, avaliar, ajustarPlano, vincularDocumento } from '../support/flows';
-import { avaliacoesPath } from '../support/client';
+import { cadastrar, avaliar, ajustarPlano, criarProcessoSei, vincularDocumento } from '../support/flows';
 
 test('CT03 - TAE ajusta após devoluções do gestor e da fundação @api @avaliacao @ajuste', async ({ api }) => {
   const plano = await cadastrar(api, { comFundacao: true });
@@ -13,9 +12,7 @@ test('CT03 - TAE ajusta após devoluções do gestor e da fundação @api @avali
   await ajustarPlano(api, plano.id, 1234);
   await avaliar(api, plano.id, 'Direção Fundação', 'Aprovada');
   await avaliar(api, plano.id, 'Gestor Financeiro', 'Aprovada');
-  const sei = await (
-    await api.ok(await api.request.post(`${avaliacoesPath}/criar-processo-sei/${plano.id}`, { data: {} }))
-  ).json();
+  const sei = await criarProcessoSei(api, plano.id);
   await vincularDocumento(api, plano.id, sei.numeroProcesso);
   expect((await api.plano(plano.id)).etapasCronograma[0].numero).toBe(1234);
 });

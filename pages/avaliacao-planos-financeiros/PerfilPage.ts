@@ -1,5 +1,6 @@
 import { timeouts } from '../../config/timeouts';
 import { expect, Page } from '@playwright/test';
+import { ambiente } from '../../config/ambiente';
 
 export type Perfil = 'TAE' | 'Gestor Financeiro' | 'Direção Fundação';
 
@@ -39,12 +40,16 @@ export class PerfilPage {
       'Direção Fundação': 'PROJAC_DIRECAO_FUNDACAO',
     };
     await expect.poll(async () => {
-      const gateway = await this.page.evaluate(() => {
+      const gatewayObservado = await this.page.evaluate(() => {
         const menu = performance.getEntriesByType('resource').find(entry =>
           new URL(entry.name).pathname === '/comum-service/menu');
         return menu ? new URL(menu.name).origin : undefined;
       });
-      expect(gateway, 'Gateway observado no carregamento do menu').toBeTruthy();
+      const gateway =
+        gatewayObservado ??
+        (ambiente === 'homolog'
+          ? 'https://gwms-sagui-homolog.cercomp.ufg.br'
+          : 'https://gwms-sagui-dev.cercomp.ufg.br');
       const url = new URL('/projac-comum-service/projeto-academico/usuario-cas', gateway).href;
       const resposta = await this.page.request.get(url);
       expect(resposta.ok()).toBe(true);
