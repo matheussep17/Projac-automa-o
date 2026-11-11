@@ -1,11 +1,31 @@
 import { timeouts } from '../config/timeouts';
 import { expect, Page } from '@playwright/test';
-import { baseURL } from '../config/ambiente';
+import { ambiente, baseURL } from '../config/ambiente';
 import { ambienteData } from '../test-data/ambientes';
 import { Perfil, PerfilPage } from '../pages/avaliacao-planos-financeiros/PerfilPage';
+import path from 'node:path';
+import { loadEnvFile } from 'node:process';
 
-const LOGIN = 'igor_vieira';
-const PASSWORD = 'igor_vieira';
+try {
+  const projectEnv = path.resolve(__dirname, '..', '.env');
+  loadEnvFile(projectEnv);
+} catch (error) {
+  // O .env é opcional; em CI, as credenciais podem vir do ambiente do processo.
+  if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
+    throw error;
+  }
+}
+
+function requiredCredential(name: string): string {
+  const value = process.env[name] ?? process.env[`PROJAC_${ambiente.toUpperCase()}_${name.replace('PROJAC_', '')}`];
+  if (!value) {
+    throw new Error(
+      `Credencial ausente para ${ambiente}. Defina ${name} ou a variável específica do ambiente no processo de execução.`,
+    );
+  }
+  return value;
+}
+
 const HOME = `${baseURL}/projac/`;
 
 export async function loginAsTae(page: Page): Promise<void> {
@@ -13,6 +33,9 @@ export async function loginAsTae(page: Page): Promise<void> {
 }
 
 export async function loginComPerfil(page: Page, perfil: Perfil): Promise<void> {
+  const login = requiredCredential('PROJAC_LOGIN');
+  const password = requiredCredential('PROJAC_PASSWORD');
+
   await page.goto(HOME, { waitUntil: 'domcontentloaded' });
   const loginField = page.getByRole('textbox', { name: 'Informe seu login' });
   await expect(
@@ -24,9 +47,9 @@ export async function loginComPerfil(page: Page, perfil: Perfil): Promise<void> 
       await cookieButton.click();
     }
 
-    await loginField.fill(LOGIN);
+    await loginField.fill(login);
     const passwordField = page.getByRole('textbox', { name: 'Senha' });
-    await passwordField.fill(PASSWORD);
+    await passwordField.fill(password);
 
     // O botão do formulário CAS nem sempre expõe o nome acessível corretamente.
     const enterButton = page.getByRole('button', { name: /LOGIN/i });
